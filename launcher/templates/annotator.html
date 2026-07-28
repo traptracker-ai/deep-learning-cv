@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annotator · {{ module.code }}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --ink:        #15161a;
+      --paper:      #f6f1e7;
+      --paper-2:    #ede5d2;
+      --rule:       #2a2b30;
+      --muted:      #6b6a64;
+      --accent:     #c0322b;
+      --accent-ink: #7a1f1c;
+      --panel:      #ffffff;
+      --canvas-bg:  #1a1d22;
+      --done:       #2d6a3f;
+      --done-bg:    #e3efd9;
+      --todo-bg:    #efe6c8;
+
+      /* Per-class palette — five distinct hues chosen for canvas legibility */
+      --cls-0: #d6336c;   /* badger — rose pink */
+      --cls-1: #f59f00;   /* fox — amber */
+      --cls-2: #2b8a3e;   /* deer — green */
+      --cls-3: #9a59f4;   /* hedgehog — purple */
+      --cls-4: #1c7ed6;   /* squirrel — blue */
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       Top bar
+       ============================================================ */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper);
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+
+    .brand .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: 1px;
+    }
+
+    .brand .module {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .brand .title {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: -0.005em;
+    }
+
+    .save-indicator {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      transition: opacity 200ms;
+    }
+
+    .save-indicator.visible { opacity: 1; }
+    .save-indicator.saved { color: var(--done); }
+    .save-indicator.error { color: var(--accent); }
+
+    .back-link {
+      color: var(--accent-ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 1px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    /* ============================================================
+       Three-pane layout
+       ============================================================ */
+    .layout {
+      display: grid;
+      grid-template-columns: 200px 1fr 320px;
+      height: calc(100vh - 53px);
+    }
+
+    /* ============================================================
+       Left pane: image thumbnails
+       ============================================================ */
+    .images-pane {
+      background: var(--paper-2);
+      border-right: 1px solid var(--rule);
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .pane-heading {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 8px 4px 12px;
+    }
+
+    .thumb {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      margin-bottom: 4px;
+      transition: background 120ms;
+      border-radius: 2px;
+    }
+
+    .thumb:hover { background: rgba(0, 0, 0, 0.04); }
+
+    .thumb.active {
+      background: var(--paper);
+      border-color: var(--rule);
+    }
+
+    .thumb img {
+      width: 56px;
+      height: 42px;
+      object-fit: cover;
+      background: #222;
+      border: 1px solid var(--rule);
+      flex-shrink: 0;
+    }
+
+    .thumb-meta {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .thumb-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .thumb-status {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .thumb-status.has-boxes { color: var(--done); font-weight: 500; }
+
+    /* ============================================================
+       Centre pane: canvas
+       ============================================================ */
+    .canvas-pane {
+      background: var(--canvas-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+      cursor: crosshair;
+      background: #000;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    canvas.cursor-default { cursor: default; }
+    canvas.cursor-move { cursor: move; }
+    canvas.cursor-nwse { cursor: nwse-resize; }
+
+    canvas.cursor-pan { cursor: grab; }
+    canvas.cursor-panning { cursor: grabbing; }
+
+    /* ---------- Zoom controls overlay ---------- */
+    .zoom-overlay {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #e8e3d2;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      z-index: 5;
+    }
+
+    .zoom-btn {
+      background: none;
+      border: none;
+      color: #e8e3d2;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      font-family: 'IBM Plex Mono', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 120ms;
+      line-height: 1;
+    }
+    .zoom-btn:hover { background: rgba(255, 255, 255, 0.12); }
+    .zoom-btn:active { background: rgba(255, 255, 255, 0.20); }
+
+    .zoom-level {
+      min-width: 50px;
+      text-align: center;
+      padding: 0 4px;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .zoom-reset {
+      font-size: 10px;
+      padding: 0 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .canvas-empty {
+      color: #888;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    .help-bar {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.65);
+      pointer-events: none;
+    }
+
+    .help-bar kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 3px;
+      margin: 0 2px;
+      font-size: 10px;
+    }
+
+    /* ============================================================
+       Right pane: classes + YOLO panel
+       ============================================================ */
+    .info-pane {
+      background: var(--paper);
+      border-left: 1px solid var(--rule);
+      overflow-y: auto;
+      padding: 16px 16px 24px;
+    }
+
+    .class-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .class-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      cursor: pointer;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 13px;
+      transition: all 120ms ease;
+      text-align: left;
+    }
+
+    .class-btn:hover { background: var(--paper-2); }
+
+    .class-btn.active {
+      border-color: var(--ink);
+      box-shadow: inset 4px 0 0 0 var(--ink);
+      background: var(--paper-2);
+    }
+
+    .class-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .class-name {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .class-key {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .pane-section + .pane-section { margin-top: 22px; }
+
+    .yolo-panel {
+      background: #15161a;
+      color: #e0d9c9;
+      padding: 12px 14px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      border-radius: 2px;
+      min-height: 60px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .yolo-empty {
+      color: #6b6a64;
+      font-style: italic;
+    }
+
+    .yolo-row {
+      display: block;
+      padding: 1px 0;
+    }
+
+    .yolo-row .cls {
+      display: inline-block;
+      width: 1.5em;
+      margin-right: 6px;
+      font-weight: 600;
+    }
+
+    .selected-info {
+      padding: 10px 12px;
+      background: var(--paper-2);
+      border-left: 3px solid var(--accent);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: var(--ink);
+      min-height: 80px;
+    }
+
+    .selected-empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .selected-info strong {
+      color: var(--ink);
+    }
+
+    .selected-info button.delete-btn {
+      margin-top: 8px;
+      padding: 5px 12px;
+      background: var(--accent);
+      color: var(--paper);
+      border: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 120ms;
+    }
+    .selected-info button.delete-btn:hover { background: var(--accent-ink); }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div>
+        <span class="dot"></span>
+        <span class="module">{{ module.code }} · Annotator</span>
+      </div>
+      <span class="title" id="image-title">—</span>
+    </div>
+    <div style="display:flex;gap:18px;align-items:baseline;">
+      <span class="save-indicator" id="save-indicator">Saved</span>
+      <a href="/" class="back-link" target="_self">← Back to launcher</a>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <aside class="images-pane">
+      <div class="pane-heading">Images <span id="progress-count" style="color:var(--done);font-weight:500;"></span></div>
+      <div id="thumbs-list"></div>
+    </aside>
+
+    <main class="canvas-pane">
+      <canvas id="canvas"></canvas>
+      <div class="canvas-empty" id="canvas-empty" style="display:none;">No image loaded</div>
+
+      <div class="zoom-overlay">
+        <button class="zoom-btn" id="zoom-out-btn" title="Zoom out (−)">−</button>
+        <span class="zoom-level" id="zoom-level">100%</span>
+        <button class="zoom-btn" id="zoom-in-btn" title="Zoom in (+)">+</button>
+        <button class="zoom-btn zoom-reset" id="zoom-reset-btn" title="Fit image (0)">Fit</button>
+      </div>
+
+      <div class="help-bar">
+        <span><kbd>Click + drag</kbd> draw box</span>
+        <span><kbd>1</kbd>–<kbd>5</kbd> class</span>
+        <span><kbd>Wheel</kbd> zoom</span>
+        <span><kbd>Shift + drag</kbd> pan</span>
+        <span><kbd>←</kbd> <kbd>→</kbd> image</span>
+        <span><kbd>Del</kbd> delete</span>
+        <span><kbd>Esc</kbd> deselect</span>
+      </div>
+    </main>
+
+    <aside class="info-pane">
+
+      <div class="pane-section">
+        <div class="pane-heading">Class</div>
+        <div class="class-buttons" id="class-buttons"></div>
+      </div>
+
+      <div class="pane-section">
+        <div class="pane-heading">Selected box</div>
+        <div class="selected-info" id="selected-info">
+          <span class="selected-empty">No box selected. Draw one with click-and-drag, or click an existing box to select it.</span>
+        </div>
+      </div>
+
+      <div class="pane-section">
+        <div class="pane-heading">YOLO label file <span style="opacity:0.6;">·  classes are 0-indexed</span></div>
+        <div class="yolo-panel" id="yolo-panel"><span class="yolo-empty">No boxes yet</span></div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <script>
+  // ===================================================================
+  // 7144COMP annotator — bounding-box drawing with YOLO-format output
+  // ===================================================================
+
+  const state = {
+    classes: [],          // [name, name, ...]  indexed by class_id
+    images: [],           // [{name, n_boxes}, ...]
+    currentImage: null,   // filename or null
+    boxes: [],            // [{class_id, cx, cy, w, h}]  (normalised 0-1)
+    selectedClass: 0,
+    selectedBoxIdx: -1,
+    img: null,            // Image element
+    // Drawing state
+    drawing: false,
+    drawStart: null,      // {x, y} in image-pixel coordinates
+    drawCurrent: null,
+    // Move/resize state
+    interact: null,       // {type: 'move'|'resize-tl'|..., boxIdx, startMouse, startBox}
+    // Canvas display dims (the CSS size, NOT the canvas backing-store size)
+    displayW: 0,
+    displayH: 0,
+    // View transform — applied when drawing/picking. View coords = image coords * scale + offset.
+    // scale = 1.0 means "fit image inside canvas" (so the image fills the visible area at zoom 100%).
+    view: { scale: 1.0, offsetX: 0, offsetY: 0 },
+    // Pan-in-progress
+    panning: null,        // {startMouseX, startMouseY, startOffsetX, startOffsetY}
+    // Save debounce
+    saveTimer: null,
+  };
+
+  // Zoom configuration
+  const ZOOM_MIN = 1.0;        // can't go below 'fit'
+  const ZOOM_MAX = 12.0;       // 12x is plenty for 800x600 -> roughly 1px per ~10 screen-pixels
+  const ZOOM_STEP = 1.2;       // multiplicative step for wheel and +/-
+
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  const thumbsList = document.getElementById("thumbs-list");
+  const classButtons = document.getElementById("class-buttons");
+  const yoloPanel = document.getElementById("yolo-panel");
+  const selectedInfo = document.getElementById("selected-info");
+  const imageTitle = document.getElementById("image-title");
+  const canvasEmpty = document.getElementById("canvas-empty");
+  const saveIndicator = document.getElementById("save-indicator");
+  const progressCount = document.getElementById("progress-count");
+  const zoomInBtn = document.getElementById("zoom-in-btn");
+  const zoomOutBtn = document.getElementById("zoom-out-btn");
+  const zoomResetBtn = document.getElementById("zoom-reset-btn");
+  const zoomLevelEl = document.getElementById("zoom-level");
+
+  // ===================================================================
+  // Helpers
+  // ===================================================================
+
+  function classColour(id) {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(`--cls-${id}`)
+      .trim() || "#888";
+  }
+
+  function debounce(fn, ms) {
+    return function (...args) {
+      if (state.saveTimer) clearTimeout(state.saveTimer);
+      state.saveTimer = setTimeout(() => fn.apply(this, args), ms);
+    };
+  }
+
+  // ===================================================================
+  // View transform
+  // ===================================================================
+  // The image fits the canvas at scale=1.0 (zoom level 100%). At higher
+  // scales the image is bigger than the canvas and the visible region is
+  // controlled by `state.view.offsetX` and `offsetY`, which are the
+  // top-left coordinates of the visible region in IMAGE PIXEL space.
+  //
+  // imagePixel -> canvasPixel:
+  //   canvasX = (imageX - offsetX) * canvas.width / fitScaledImageWidth
+  //   But since we draw using ctx.translate/scale, the maths simplifies
+  //   and we just need to apply the inverse for hit-testing.
+
+  function applyViewTransform() {
+    // Reset and apply: scale up by `view.scale`, then translate so the
+    // visible top-left of the image lands at canvas (0, 0).
+    const s = state.view.scale;
+    ctx.setTransform(s, 0, 0, s, -state.view.offsetX * s, -state.view.offsetY * s);
+  }
+
+  function clampOffsets() {
+    // Don't let the user pan past the edges of the image.
+    if (!state.img) return;
+    const visibleW = canvas.width / state.view.scale;
+    const visibleH = canvas.height / state.view.scale;
+    const maxX = Math.max(0, state.img.naturalWidth - visibleW);
+    const maxY = Math.max(0, state.img.naturalHeight - visibleH);
+    state.view.offsetX = Math.max(0, Math.min(maxX, state.view.offsetX));
+    state.view.offsetY = Math.max(0, Math.min(maxY, state.view.offsetY));
+  }
+
+  function resetView() {
+    state.view = { scale: 1.0, offsetX: 0, offsetY: 0 };
+    updateZoomIndicator();
+  }
+
+  function updateZoomIndicator() {
+    zoomLevelEl.textContent = `${Math.round(state.view.scale * 100)}%`;
+  }
+
+  function setZoom(newScale, anchorCanvasX, anchorCanvasY) {
+    // Zoom toward a given anchor point in canvas pixels (so the image
+    // pixel under the cursor stays under the cursor).
+    newScale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newScale));
+    if (newScale === state.view.scale) return;
+
+    // Image pixel currently under the anchor
+    const imageX = state.view.offsetX + anchorCanvasX / state.view.scale;
+    const imageY = state.view.offsetY + anchorCanvasY / state.view.scale;
+
+    state.view.scale = newScale;
+
+    // Recompute offset so that same image pixel is still at the same anchor.
+    state.view.offsetX = imageX - anchorCanvasX / newScale;
+    state.view.offsetY = imageY - anchorCanvasY / newScale;
+
+    clampOffsets();
+    updateZoomIndicator();
+    draw();
+  }
+
+  function flashSaved(status = "saved") {
+    saveIndicator.classList.remove("error", "saved");
+    saveIndicator.classList.add(status);
+    saveIndicator.textContent = status === "saved" ? "Saved" : "Save failed";
+    saveIndicator.classList.add("visible");
+    setTimeout(() => saveIndicator.classList.remove("visible"), 1100);
+  }
+
+  // ===================================================================
+  // Initial load
+  // ===================================================================
+
+  async function init() {
+    const res = await fetch("/annotator/api/state");
+    const data = await res.json();
+    state.classes = data.classes;
+    state.images = data.images;
+    renderClassButtons();
+    renderThumbnails();
+    updateProgress();
+    if (state.images.length > 0) {
+      await loadImage(state.images[0].name);
+    } else {
+      canvas.style.display = "none";
+      canvasEmpty.style.display = "block";
+      canvasEmpty.textContent = "No images found in data/images/";
+    }
+  }
+
+  function renderClassButtons() {
+    classButtons.innerHTML = "";
+    state.classes.forEach((name, i) => {
+      const btn = document.createElement("button");
+      btn.className = "class-btn" + (i === state.selectedClass ? " active" : "");
+      btn.innerHTML = `
+        <span class="class-swatch" style="background:${classColour(i)}"></span>
+        <span class="class-name">${name}</span>
+        <span class="class-key">${i + 1}</span>
+      `;
+      btn.addEventListener("click", () => {
+        state.selectedClass = i;
+        // If a box is selected, change its class to the picked one.
+        if (state.selectedBoxIdx >= 0) {
+          state.boxes[state.selectedBoxIdx].class_id = i;
+          draw();
+          renderYoloPanel();
+          renderSelectedInfo();
+          autosave();
+        }
+        renderClassButtons();
+      });
+      classButtons.appendChild(btn);
+    });
+  }
+
+  function renderThumbnails() {
+    thumbsList.innerHTML = "";
+    state.images.forEach(img => {
+      const div = document.createElement("div");
+      div.className = "thumb" + (img.name === state.currentImage ? " active" : "");
+      const status = img.n_boxes > 0
+        ? `<span class="thumb-status has-boxes">${img.n_boxes} box${img.n_boxes === 1 ? "" : "es"}</span>`
+        : `<span class="thumb-status">unlabelled</span>`;
+      div.innerHTML = `
+        <img src="/annotator/api/image/${encodeURIComponent(img.name)}" alt="" />
+        <div class="thumb-meta">
+          <span class="thumb-name">${img.name}</span>
+          ${status}
+        </div>
+      `;
+      div.addEventListener("click", () => loadImage(img.name));
+      thumbsList.appendChild(div);
+    });
+  }
+
+  function updateProgress() {
+    const done = state.images.filter(i => i.n_boxes > 0).length;
+    progressCount.textContent = ` · ${done} / ${state.images.length} labelled`;
+  }
+
+  // ===================================================================
+  // Load an image and its existing annotations
+  // ===================================================================
+
+  async function loadImage(name) {
+    state.currentImage = name;
+    state.selectedBoxIdx = -1;
+    state.drawing = false;
+    state.interact = null;
+    state.panning = null;
+    resetView();
+    imageTitle.textContent = name;
+
+    // Get existing annotations.
+    const res = await fetch(`/annotator/api/annotations/${encodeURIComponent(name)}`);
+    const data = await res.json();
+    state.boxes = data.boxes || [];
+
+    // Load the image.
+    state.img = new Image();
+    state.img.onload = () => {
+      sizeCanvas();
+      draw();
+      renderYoloPanel();
+      renderSelectedInfo();
+    };
+    state.img.src = `/annotator/api/image/${encodeURIComponent(name)}`;
+    renderThumbnails();
+  }
+
+  function sizeCanvas() {
+    if (!state.img) return;
+    // Fit the image inside the available pane area while preserving aspect ratio.
+    const pane = canvas.parentElement;
+    const maxW = pane.clientWidth - 40;
+    const maxH = pane.clientHeight - 60;   // leave room for help bar
+    const imgRatio = state.img.naturalWidth / state.img.naturalHeight;
+    const paneRatio = maxW / maxH;
+    let w, h;
+    if (imgRatio > paneRatio) {
+      w = maxW;
+      h = maxW / imgRatio;
+    } else {
+      h = maxH;
+      w = maxH * imgRatio;
+    }
+    canvas.width = state.img.naturalWidth;
+    canvas.height = state.img.naturalHeight;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    state.displayW = w;
+    state.displayH = h;
+  }
+
+  // ===================================================================
+  // Drawing the canvas (called on every change)
+  // ===================================================================
+
+  function draw() {
+    if (!state.img) return;
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Clear the whole canvas first (in identity transform), then apply view.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, W, H);
+
+    applyViewTransform();
+    ctx.drawImage(state.img, 0, 0);
+
+    // Draw all boxes in image coordinates. Strokes etc. will scale with
+    // the view transform, so we counter-adjust line widths per-call.
+    state.boxes.forEach((b, i) => drawBox(b, i === state.selectedBoxIdx));
+
+    // Draw the in-progress drawing box on top.
+    if (state.drawing && state.drawStart && state.drawCurrent) {
+      const x = Math.min(state.drawStart.x, state.drawCurrent.x);
+      const y = Math.min(state.drawStart.y, state.drawCurrent.y);
+      const w = Math.abs(state.drawCurrent.x - state.drawStart.x);
+      const h = Math.abs(state.drawCurrent.y - state.drawStart.y);
+      ctx.save();
+      ctx.strokeStyle = classColour(state.selectedClass);
+      ctx.lineWidth = 3 / state.view.scale;
+      ctx.setLineDash([6 / state.view.scale, 4 / state.view.scale]);
+      ctx.strokeRect(x, y, w, h);
+      ctx.restore();
+    }
+
+    // Reset transform for any subsequent overlay (handles drawn in screen-space).
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    // Handles drawn in CANVAS-BACKING-STORE coords so they don't scale with zoom.
+    state.boxes.forEach((b, i) => {
+      if (i === state.selectedBoxIdx) drawHandles(b);
+    });
+  }
+
+  function drawBox(b, isSelected) {
+    const W = canvas.width;
+    const H = canvas.height;
+    const x = (b.cx - b.w / 2) * W;
+    const y = (b.cy - b.h / 2) * H;
+    const w = b.w * W;
+    const h = b.h * H;
+    const colour = classColour(b.class_id);
+    const s = state.view.scale;
+
+    // Box outline — counter-scale line widths so they stay visually constant.
+    ctx.save();
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = (isSelected ? 4 : 2.5) / s;
+    ctx.strokeRect(x, y, w, h);
+
+    // Class label — keep font size constant on screen by counter-scaling.
+    const fontPx = 18 / s;
+    ctx.font = `bold ${fontPx}px 'IBM Plex Mono', monospace`;
+    const label = state.classes[b.class_id] || `class ${b.class_id}`;
+    const metrics = ctx.measureText(label);
+    const padX = 8 / s, padY = 4 / s;
+    const labelH = 24 / s;
+    ctx.fillStyle = colour;
+    ctx.fillRect(x, y - labelH, metrics.width + padX * 2, labelH);
+    ctx.fillStyle = "#fff";
+    ctx.fillText(label, x + padX, y - padY - 2 / s);
+
+    ctx.restore();
+  }
+
+  function drawHandles(b) {
+    // Handles drawn in canvas backing-store space (i.e. after resetting the
+    // transform), so their on-screen size is constant regardless of zoom.
+    const colour = classColour(b.class_id);
+    const s = state.view.scale;
+    // Get the box corners in canvas-backing coords using the view transform.
+    const x1_img = (b.cx - b.w / 2) * canvas.width;
+    const y1_img = (b.cy - b.h / 2) * canvas.height;
+    const x2_img = (b.cx + b.w / 2) * canvas.width;
+    const y2_img = (b.cy + b.h / 2) * canvas.height;
+    const x1 = (x1_img - state.view.offsetX) * s;
+    const y1 = (y1_img - state.view.offsetY) * s;
+    const x2 = (x2_img - state.view.offsetX) * s;
+    const y2 = (y2_img - state.view.offsetY) * s;
+    const handle = 8;
+    ctx.save();
+    ctx.fillStyle = "#fff";
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = 2;
+    for (const [hx, hy] of [[x1, y1], [x2, y1], [x1, y2], [x2, y2]]) {
+      ctx.fillRect(hx - handle / 2, hy - handle / 2, handle, handle);
+      ctx.strokeRect(hx - handle / 2, hy - handle / 2, handle, handle);
+    }
+    ctx.restore();
+  }
+
+  function renderYoloPanel() {
+    if (state.boxes.length === 0) {
+      yoloPanel.innerHTML = '<span class="yolo-empty">No boxes yet — the .txt file will be empty</span>';
+      return;
+    }
+    const rows = state.boxes.map((b, i) => {
+      const sel = (i === state.selectedBoxIdx) ? ' style="background:#2a2d33;padding:1px 4px;margin:-1px -4px;"' : "";
+      const colour = classColour(b.class_id);
+      return `<span class="yolo-row"${sel}>` +
+             `<span class="cls" style="color:${colour}">${b.class_id}</span>` +
+             `${b.cx.toFixed(6)} ${b.cy.toFixed(6)} ${b.w.toFixed(6)} ${b.h.toFixed(6)}` +
+             `</span>`;
+    }).join("");
+    yoloPanel.innerHTML = rows;
+  }
+
+  function renderSelectedInfo() {
+    if (state.selectedBoxIdx < 0 || !state.boxes[state.selectedBoxIdx]) {
+      selectedInfo.innerHTML = '<span class="selected-empty">No box selected. Draw one with click-and-drag, or click an existing box to select it.</span>';
+      return;
+    }
+    const b = state.boxes[state.selectedBoxIdx];
+    const className = state.classes[b.class_id] || `class ${b.class_id}`;
+    const colour = classColour(b.class_id);
+    selectedInfo.innerHTML = `
+      <strong style="color:${colour};">${className}</strong> (id ${b.class_id})<br/>
+      centre: ${(b.cx * 100).toFixed(1)}%, ${(b.cy * 100).toFixed(1)}%<br/>
+      size: ${(b.w * 100).toFixed(1)}% × ${(b.h * 100).toFixed(1)}%<br/>
+      <button class="delete-btn" id="delete-selected">Delete box</button>
+    `;
+    document.getElementById("delete-selected").addEventListener("click", deleteSelected);
+  }
+
+  // ===================================================================
+  // Mouse coords <-> image coords
+  // ===================================================================
+
+  // Get mouse position in canvas-backing-store coordinates (independent of
+  // CSS scaling but NOT yet of view transform). Used as the anchor for
+  // zoom-at-cursor.
+  function mouseToCanvas(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  }
+
+  // Get mouse position in IMAGE coordinates, accounting for view transform.
+  function mouseToImage(e) {
+    const c = mouseToCanvas(e);
+    return {
+      x: c.x / state.view.scale + state.view.offsetX,
+      y: c.y / state.view.scale + state.view.offsetY,
+    };
+  }
+
+  function hitTestBox(pt) {
+    // pt is in IMAGE coordinates. We hit-test in image space and use a
+    // tolerance for resize handles that's expressed in screen pixels, then
+    // converted back to image pixels using the current zoom level.
+    const handle_screen_px = 10;
+    const handle_image_px = handle_screen_px / state.view.scale;
+
+    // Reverse iterate so the topmost box wins.
+    for (let i = state.boxes.length - 1; i >= 0; i--) {
+      const b = state.boxes[i];
+      const x = (b.cx - b.w / 2) * canvas.width;
+      const y = (b.cy - b.h / 2) * canvas.height;
+      const w = b.w * canvas.width;
+      const h = b.h * canvas.height;
+      if (pt.x >= x && pt.x <= x + w && pt.y >= y && pt.y <= y + h) {
+        const corners = [
+          ["resize-tl", x, y],
+          ["resize-tr", x + w, y],
+          ["resize-bl", x, y + h],
+          ["resize-br", x + w, y + h],
+        ];
+        for (const [type, hx, hy] of corners) {
+          if (Math.abs(pt.x - hx) < handle_image_px && Math.abs(pt.y - hy) < handle_image_px) {
+            return { boxIdx: i, type };
+          }
+        }
+        return { boxIdx: i, type: "move" };
+      }
+    }
+    return null;
+  }
+
+  // ===================================================================
+  // Mouse events
+  // ===================================================================
+
+  canvas.addEventListener("mousedown", e => {
+    if (!state.img) return;
+
+    // Pan trigger: middle mouse button, OR Shift + left click.
+    if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+      e.preventDefault();
+      const c = mouseToCanvas(e);
+      state.panning = {
+        startMouseX: c.x,
+        startMouseY: c.y,
+        startOffsetX: state.view.offsetX,
+        startOffsetY: state.view.offsetY,
+      };
+      canvas.className = "cursor-panning";
+      return;
+    }
+    if (e.button !== 0) return;   // ignore right-click for now
+
+    const pt = mouseToImage(e);
+    const hit = hitTestBox(pt);
+
+    if (hit) {
+      // Select and start interacting (move or resize)
+      state.selectedBoxIdx = hit.boxIdx;
+      state.interact = {
+        type: hit.type,
+        boxIdx: hit.boxIdx,
+        startMouse: pt,
+        startBox: { ...state.boxes[hit.boxIdx] },
+      };
+      draw();
+      renderYoloPanel();
+      renderSelectedInfo();
+    } else {
+      // Start drawing a new box
+      state.selectedBoxIdx = -1;
+      state.drawing = true;
+      state.drawStart = pt;
+      state.drawCurrent = pt;
+      renderSelectedInfo();
+    }
+  });
+
+  canvas.addEventListener("mousemove", e => {
+    if (!state.img) return;
+
+    if (state.panning) {
+      const c = mouseToCanvas(e);
+      // Convert canvas-pixel delta into image-pixel delta via inverse scale.
+      const dx = (c.x - state.panning.startMouseX) / state.view.scale;
+      const dy = (c.y - state.panning.startMouseY) / state.view.scale;
+      state.view.offsetX = state.panning.startOffsetX - dx;
+      state.view.offsetY = state.panning.startOffsetY - dy;
+      clampOffsets();
+      draw();
+      return;
+    }
+
+    const pt = mouseToImage(e);
+
+    if (state.drawing) {
+      state.drawCurrent = pt;
+      draw();
+      return;
+    }
+
+    if (state.interact) {
+      const dx = (pt.x - state.interact.startMouse.x) / canvas.width;
+      const dy = (pt.y - state.interact.startMouse.y) / canvas.height;
+      const b = { ...state.interact.startBox };
+      const t = state.interact.type;
+
+      if (t === "move") {
+        b.cx = state.interact.startBox.cx + dx;
+        b.cy = state.interact.startBox.cy + dy;
+      } else {
+        // Resize — adjust the relevant corner.
+        let x1 = b.cx - b.w / 2;
+        let y1 = b.cy - b.h / 2;
+        let x2 = b.cx + b.w / 2;
+        let y2 = b.cy + b.h / 2;
+        if (t === "resize-tl") { x1 += dx; y1 += dy; }
+        if (t === "resize-tr") { x2 += dx; y1 += dy; }
+        if (t === "resize-bl") { x1 += dx; y2 += dy; }
+        if (t === "resize-br") { x2 += dx; y2 += dy; }
+        // Allow inverted drags
+        const nx1 = Math.min(x1, x2);
+        const nx2 = Math.max(x1, x2);
+        const ny1 = Math.min(y1, y2);
+        const ny2 = Math.max(y1, y2);
+        b.cx = (nx1 + nx2) / 2;
+        b.cy = (ny1 + ny2) / 2;
+        b.w = nx2 - nx1;
+        b.h = ny2 - ny1;
+      }
+
+      state.boxes[state.interact.boxIdx] = b;
+      draw();
+      renderYoloPanel();
+      renderSelectedInfo();
+      return;
+    }
+
+    // Hover cursor — show pan grab when Shift is held.
+    if (e.shiftKey) {
+      canvas.className = "cursor-pan";
+      return;
+    }
+    const hit = hitTestBox(pt);
+    if (hit) {
+      canvas.className = hit.type === "move" ? "cursor-move" : "cursor-nwse";
+    } else {
+      canvas.className = "";
+    }
+  });
+
+  canvas.addEventListener("mouseup", e => {
+    if (!state.img) return;
+
+    if (state.panning) {
+      state.panning = null;
+      canvas.className = "";
+      return;
+    }
+
+    if (state.drawing) {
+      const a = state.drawStart;
+      const b = state.drawCurrent;
+      const px1 = Math.min(a.x, b.x);
+      const py1 = Math.min(a.y, b.y);
+      const px2 = Math.max(a.x, b.x);
+      const py2 = Math.max(a.y, b.y);
+      const w_px = px2 - px1;
+      const h_px = py2 - py1;
+      // Reject too-small drags (probably a click, not a box)
+      if (w_px > 5 && h_px > 5) {
+        const cx = (px1 + px2) / 2 / canvas.width;
+        const cy = (py1 + py2) / 2 / canvas.height;
+        const w = w_px / canvas.width;
+        const h = h_px / canvas.height;
+        state.boxes.push({
+          class_id: state.selectedClass,
+          cx, cy, w, h,
+        });
+        state.selectedBoxIdx = state.boxes.length - 1;
+      }
+      state.drawing = false;
+      state.drawStart = null;
+      state.drawCurrent = null;
+      draw();
+      renderYoloPanel();
+      renderSelectedInfo();
+      autosave();
+    } else if (state.interact) {
+      // End of move/resize — commit and clamp.
+      const b = state.boxes[state.interact.boxIdx];
+      b.w = Math.max(0.01, Math.min(1, b.w));
+      b.h = Math.max(0.01, Math.min(1, b.h));
+      b.cx = Math.max(b.w / 2, Math.min(1 - b.w / 2, b.cx));
+      b.cy = Math.max(b.h / 2, Math.min(1 - b.h / 2, b.cy));
+      state.interact = null;
+      draw();
+      renderYoloPanel();
+      renderSelectedInfo();
+      autosave();
+    }
+  });
+
+  canvas.addEventListener("mouseleave", () => {
+    canvas.className = "";
+  });
+
+  // Mouse wheel: zoom toward cursor.
+  canvas.addEventListener("wheel", e => {
+    if (!state.img) return;
+    e.preventDefault();
+    const c = mouseToCanvas(e);
+    // Positive deltaY (wheel down) = zoom out; negative = zoom in.
+    // Use multiplicative step so it feels exponential, like Photoshop/Maps.
+    const factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
+    setZoom(state.view.scale * factor, c.x, c.y);
+  }, { passive: false });
+
+  // Zoom buttons — anchored to canvas centre.
+  function zoomFromCentre(factor) {
+    setZoom(state.view.scale * factor, canvas.width / 2, canvas.height / 2);
+  }
+  zoomInBtn.addEventListener("click", () => zoomFromCentre(ZOOM_STEP));
+  zoomOutBtn.addEventListener("click", () => zoomFromCentre(1 / ZOOM_STEP));
+  zoomResetBtn.addEventListener("click", () => {
+    resetView();
+    draw();
+  });
+
+  // ===================================================================
+  // Keyboard
+  // ===================================================================
+
+  document.addEventListener("keydown", e => {
+    // Class shortcuts 1..N
+    if (e.key >= "1" && e.key <= "9") {
+      const idx = parseInt(e.key, 10) - 1;
+      if (idx < state.classes.length) {
+        state.selectedClass = idx;
+        if (state.selectedBoxIdx >= 0) {
+          state.boxes[state.selectedBoxIdx].class_id = idx;
+          draw();
+          renderYoloPanel();
+          renderSelectedInfo();
+          autosave();
+        }
+        renderClassButtons();
+      }
+      return;
+    }
+    if (e.key === "Delete" || e.key === "Backspace") {
+      deleteSelected();
+      return;
+    }
+    if (e.key === "Escape") {
+      state.selectedBoxIdx = -1;
+      draw();
+      renderYoloPanel();
+      renderSelectedInfo();
+      return;
+    }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      const idx = state.images.findIndex(i => i.name === state.currentImage);
+      let next = idx + (e.key === "ArrowRight" ? 1 : -1);
+      if (next < 0) next = state.images.length - 1;
+      if (next >= state.images.length) next = 0;
+      loadImage(state.images[next].name);
+      return;
+    }
+    // Zoom shortcuts
+    if (e.key === "+" || e.key === "=") {
+      zoomFromCentre(ZOOM_STEP);
+      return;
+    }
+    if (e.key === "-" || e.key === "_") {
+      zoomFromCentre(1 / ZOOM_STEP);
+      return;
+    }
+    if (e.key === "0") {
+      resetView();
+      draw();
+      return;
+    }
+  });
+
+  function deleteSelected() {
+    if (state.selectedBoxIdx < 0) return;
+    state.boxes.splice(state.selectedBoxIdx, 1);
+    state.selectedBoxIdx = -1;
+    draw();
+    renderYoloPanel();
+    renderSelectedInfo();
+    autosave();
+  }
+
+  // ===================================================================
+  // Auto-save (debounced)
+  // ===================================================================
+
+  const autosave = debounce(async () => {
+    if (!state.currentImage) return;
+    try {
+      const res = await fetch(`/annotator/api/annotations/${encodeURIComponent(state.currentImage)}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({boxes: state.boxes}),
+      });
+      const data = await res.json();
+      if (data.status === "ok") {
+        flashSaved("saved");
+        // Update the cached count for this image in the thumb list.
+        const img = state.images.find(i => i.name === state.currentImage);
+        if (img) {
+          img.n_boxes = data.n_boxes;
+          renderThumbnails();
+          updateProgress();
+        }
+      } else {
+        flashSaved("error");
+        console.error("Save error:", data);
+      }
+    } catch (err) {
+      flashSaved("error");
+      console.error(err);
+    }
+  }, 350);
+
+  // ===================================================================
+  // Window resize
+  // ===================================================================
+
+  window.addEventListener("resize", () => {
+    if (state.img) {
+      sizeCanvas();
+      draw();
+    }
+  });
+
+  // Go.
+  init();
+  </script>
+</body>
+</html>

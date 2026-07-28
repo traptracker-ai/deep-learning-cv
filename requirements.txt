@@ -1,0 +1,47 @@
+# ============================================================
+# 7144COMP Deep Learning — container requirements
+# ============================================================
+# This file is grown lab-by-lab as new dependencies are needed.
+# Pin versions to keep the module reproducible across the cohort.
+#
+# NOTE: torch and torchvision are NOT listed here — they are
+# installed separately in the Dockerfile from the CUDA wheel index
+# so we get the GPU-enabled build. Putting them here without
+# `--index-url` would clobber that with the CPU-only wheel.
+# ============================================================
+
+# --- Core scientific stack (used by every lab) ---
+numpy==1.26.4
+pandas==2.2.3
+matplotlib==3.9.2
+scikit-learn==1.5.2
+seaborn==0.13.2
+
+# --- Jupyter + launcher ---
+jupyterlab==4.2.5
+notebook==7.2.2
+flask==3.0.3
+
+# --- Lab 1 specific ---
+# (nothing extra; uses the core stack only)
+
+# --- Lab 6: introduces YOLO-format annotation ---
+pyyaml==6.0.2
+
+# --- Lab 7: introduces object detection with Ultralytics YOLO26 ---
+# Pinned to a known-good 8.4.x release. Ultralytics releases frequently
+# (often multiple times per month) — newer versions may work but
+# haven't been tested against the lab notebooks.
+ultralytics==8.4.45
+opencv-python-headless==4.10.0.84
+onnx==1.17.0
+onnxruntime==1.20.1
+
+# --- Lab 9: zero-shot open-vocabulary detection (YOLOE text prompts) ---
+# YOLOE encodes text prompts with CLIP. ultralytics does not bundle CLIP and
+# tries to auto-install it from GitHub on first use, which fails in an offline
+# or non-root container. Installing it at build time avoids that. clip-anytorch
+# is a maintained PyPI package that provides the same `clip` import module.
+clip-anytorch==2.6.0
+ftfy==6.2.3
+regex==2024.11.6

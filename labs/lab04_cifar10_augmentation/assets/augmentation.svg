@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <defs>
+    <!-- A simple stylised cat-like silhouette to act as our 'training image' -->
+    <symbol id="cat" viewBox="0 0 100 100">
+      <!-- background sky -->
+      <rect x="0" y="0" width="100" height="100" fill="#cfe6ef"/>
+      <!-- ground -->
+      <rect x="0" y="72" width="100" height="28" fill="#5d8a4e"/>
+      <!-- cat body -->
+      <ellipse cx="55" cy="62" rx="26" ry="14" fill="#3f3a35"/>
+      <!-- cat head -->
+      <circle cx="32" cy="50" r="13" fill="#3f3a35"/>
+      <!-- ears -->
+      <polygon points="22,42 25,30 30,40" fill="#3f3a35"/>
+      <polygon points="34,38 39,28 42,42" fill="#3f3a35"/>
+      <!-- tail -->
+      <path d="M80,60 Q92,40 86,28" stroke="#3f3a35" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <!-- eye -->
+      <circle cx="28" cy="48" r="1.6" fill="#f5d24a"/>
+      <!-- legs -->
+      <rect x="44" y="70" width="3.5" height="10" fill="#3f3a35"/>
+      <rect x="64" y="70" width="3.5" height="10" fill="#3f3a35"/>
+    </symbol>
+
+    <clipPath id="cropBox">
+      <rect x="0" y="0" width="100" height="100"/>
+    </clipPath>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="360" fill="#fdfdfb"/>
+
+  <!-- Title -->
+  <text x="450" y="32" text-anchor="middle" font-size="18" font-weight="600" fill="#111827">Data augmentation — same label, four different views</text>
+  <text x="450" y="52" text-anchor="middle" font-size="13" fill="#6b7280">During training, every epoch the network sees a different randomly-transformed version of each image.</text>
+
+  <!-- Panel 1: Original -->
+  <g transform="translate(60, 100)">
+    <rect x="-5" y="-5" width="170" height="170" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+    <use href="#cat" x="0" y="0" width="160" height="160"/>
+    <text x="80" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">Original</text>
+    <text x="80" y="213" text-anchor="middle" font-size="11" fill="#6b7280">label: cat</text>
+  </g>
+
+  <!-- Panel 2: Horizontal flip -->
+  <g transform="translate(265, 100)">
+    <rect x="-5" y="-5" width="170" height="170" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+    <!-- mirror by scaling -1 in X. Translate to keep position. -->
+    <g transform="translate(160, 0) scale(-1, 1)">
+      <use href="#cat" x="0" y="0" width="160" height="160"/>
+    </g>
+    <text x="80" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">RandomHorizontalFlip</text>
+    <text x="80" y="213" text-anchor="middle" font-size="11" fill="#6b7280">label: cat (still)</text>
+  </g>
+
+  <!-- Panel 3: Random crop -->
+  <g transform="translate(470, 100)">
+    <rect x="-5" y="-5" width="170" height="170" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+    <!-- Show a zoomed-in region (top-left quadrant of original, scaled up) -->
+    <svg x="0" y="0" width="160" height="160" viewBox="10 25 60 60" preserveAspectRatio="none">
+      <use href="#cat" x="0" y="0" width="100" height="100"/>
+    </svg>
+    <text x="80" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">RandomCrop + resize</text>
+    <text x="80" y="213" text-anchor="middle" font-size="11" fill="#6b7280">label: cat (still)</text>
+  </g>
+
+  <!-- Panel 4: Rotation -->
+  <g transform="translate(675, 100)">
+    <rect x="-5" y="-5" width="170" height="170" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+    <g transform="translate(80, 80) rotate(-12) translate(-80, -80)">
+      <use href="#cat" x="0" y="0" width="160" height="160"/>
+    </g>
+    <text x="80" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">RandomRotation(±15°)</text>
+    <text x="80" y="213" text-anchor="middle" font-size="11" fill="#6b7280">label: cat (still)</text>
+  </g>
+
+  <!-- Bottom takeaway -->
+  <g transform="translate(450, 300)">
+    <line x1="-360" y1="0" x2="360" y2="0" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="0" y="22" text-anchor="middle" font-size="13" fill="#1f2937">The label is invariant to flips, small crops, and small rotations &#8202;—&#8202; so the network should be too.</text>
+    <text x="0" y="44" text-anchor="middle" font-size="12" fill="#6b7280" font-style="italic">Augmentation cheaply multiplies your training set, forcing the network to learn what's truly diagnostic of 'cat'.</text>
+  </g>
+</svg>

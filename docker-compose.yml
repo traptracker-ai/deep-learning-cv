@@ -1,0 +1,88 @@
+# ============================================================
+# 7144COMP Deep Learning — docker-compose
+# ============================================================
+# Quick start (Windows / PowerShell or macOS / Linux terminal):
+#
+#     docker compose up --build
+#
+# Then open http://localhost:8000 in your browser.
+#
+# ============================================================
+# GPU support
+# ============================================================
+# Lab 7 (YOLO training) needs a CUDA-capable NVIDIA GPU. The container
+# is built from a CUDA base image so it has all the runtime libraries,
+# but Docker still needs explicit permission to pass the host's GPU
+# through to the container — that's the `deploy.resources` block below.
+#
+# Prerequisites on the host:
+#   1. Recent NVIDIA driver (>=550 for CUDA 12.4)
+#   2. Docker Desktop (Windows/macOS) or Docker Engine (Linux)
+#   3. WSL2 backend (Windows) — default with modern Docker Desktop
+#   4. NVIDIA Container Toolkit — auto-installed by Docker Desktop on Windows;
+#      on Linux: https://github.com/NVIDIA/nvidia-container-toolkit
+#
+# Students without a GPU: comment out the `deploy:` block below and the
+# container will still build and run. Labs 1-6 are unaffected. Lab 7
+# will detect the missing GPU and fail with a clear error message.
+# ============================================================
+
+services:
+  module:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 7144comp/deep-learning:latest
+    container_name: 7144comp
+    ports:
+      - "8000:8000"   # launcher
+      - "8888:8888"   # JupyterLab (direct access if needed)
+    volumes:
+      # Bind-mount the labs folder so student edits persist on the host.
+      # On Windows this works out of the box with Docker Desktop + WSL2.
+      - ./labs:/workspace/labs
+      # INSTRUCTOR-ONLY — worked solutions for marking. Remove this line
+      # (and the solutions/ folder) before zipping a student-facing release.
+      - ./solutions:/workspace/solutions
+    environment:
+      - JUPYTER_TOKEN=7144comp
+      # Tell Ultralytics not to write to /root or send telemetry.
+      - YOLO_OFFLINE=true
+      - YOLO_CONFIG_DIR=/workspace/.ultralytics
+    restart: unless-stopped
+
+    # ------------------------------------------------------------
+    # GPU passthrough
+    # ------------------------------------------------------------
+    # Comment BOTH the `gpus` line and the `deploy:` block out if you do
+    # not have a CUDA-capable GPU and only intend to use Labs 1-6.
+    #
+    # We specify GPU access TWO ways because Docker has two code paths:
+    #
+    #   1. `gpus: all`            — the directive Docker Desktop on
+    #                               Windows/macOS honours most reliably.
+    #                               Equivalent to `docker run --gpus all`.
+    #   2. `deploy.resources...`  — the Compose-spec form, used by Docker
+    #                               Engine on Linux and Swarm.
+    #
+    # Having both is harmless: each runtime reads the one it understands
+    # and ignores the other. If your GPU still isn't visible inside the
+    # container after this, the problem is host-side (driver / NVIDIA
+    # Container Toolkit), not in this file.
+    gpus: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # ------------------------------------------------------------
+    # Shared memory bump
+    # ------------------------------------------------------------
+    # Ultralytics' DataLoader workers can fail with default /dev/shm
+    # (64 MB). 2 GB is plenty for YOLO training even at the larger
+    # variants. If you see "DataLoader worker exited unexpectedly"
+    # errors during training, raise this.
+    shm_size: '2gb'

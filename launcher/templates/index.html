@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ module.code }} · {{ module.title }}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:           #0a0e14;
+      --bg-1:         #0f1620;
+      --bg-2:         #131c28;
+      --bg-3:         #1a2535;
+      --line:         #1f2b3c;
+      --line-2:       #2a3a52;
+      --ink:          #e6edf6;
+      --ink-2:        #b3becd;
+      --ink-3:        #7e8a9c;
+      --muted:        #5a6678;
+      --accent:       #22d3ee;
+      --accent-glow:  rgba(34, 211, 238, 0.15);
+      --accent-2:     #06b6d4;
+      --green:        #34d399;
+      --amber:        #fbbf24;
+      --rose:         #fb7185;
+      --sans:         'Inter', system-ui, -apple-system, sans-serif;
+      --mono:         'IBM Plex Mono', 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* dot-grid background, very subtle */
+    body {
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 22px 22px;
+      background-position: 0 0;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    a:hover { color: var(--accent); }
+
+    /* ─────── Status bar (top, sticky) ─────── */
+    .statusbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(10, 14, 20, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--ink-2);
+    }
+    .statusbar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+    .statusbar .seg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .statusbar .seg + .seg { padding-left: 16px; border-left: 1px solid var(--line); }
+    .statusbar .label {
+      color: var(--ink-3);
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+    }
+    .statusbar .val { color: var(--ink); }
+    .statusbar .pulse {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .statusbar-right { display: flex; gap: 14px; }
+    .statusbar a { color: var(--ink-2); transition: color 0.15s; }
+    .statusbar a:hover { color: var(--accent); }
+
+    /* ─────── Page shell ─────── */
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 56px 28px 80px;
+    }
+
+    /* ─────── Hero ─────── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: end;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 40px;
+    }
+    .hero-code {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero-code::before {
+      content: "";
+      width: 24px; height: 1px;
+      background: var(--accent);
+    }
+    .hero h1 {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 44px;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      margin-bottom: 18px;
+      color: var(--ink);
+    }
+    .hero .tagline {
+      font-size: 17px;
+      color: var(--ink-2);
+      max-width: 720px;
+      line-height: 1.6;
+    }
+    .hero-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+    .hero-stats .num {
+      font-size: 28px;
+      color: var(--ink);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    /* ─────── Section heading ─────── */
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 0 0 24px;
+      gap: 24px;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-3);
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::before {
+      content: "";
+      width: 18px; height: 1px;
+      background: var(--line-2);
+    }
+    .section-sub {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    /* ─────── Lab grid ─────── */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 14px;
+      margin-bottom: 56px;
+    }
+    .lab {
+      background: var(--bg-1);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.18s, background 0.18s, transform 0.18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .lab::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--line);
+      transition: background 0.2s;
+    }
+    .lab.ready::before { background: var(--accent); }
+    .lab.todo::before  { background: var(--amber); opacity: 0.6; }
+    .lab:hover {
+      border-color: var(--line-2);
+      background: var(--bg-2);
+    }
+    .lab.ready:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 8px 24px -8px var(--accent-glow);
+    }
+
+    .lab-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      letter-spacing: 0.04em;
+    }
+    .lab-num {
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .lab-num .sep { color: var(--muted); margin: 0 6px; }
+    .lab-week { color: var(--ink-3); }
+    .status-pill {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid currentColor;
+    }
+    .status-pill.ready { color: var(--accent); }
+    .status-pill.todo  { color: var(--amber); }
+
+    .lab-title {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+    .lab .summary {
+      font-size: 13.5px;
+      color: var(--ink-2);
+      line-height: 1.55;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+    .topic-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 18px;
+    }
+    .topic {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--ink-3);
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      padding: 2px 7px;
+      border-radius: 3px;
+      letter-spacing: 0.02em;
+    }
+    .lab-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+    }
+    .duration {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .duration::before {
+      content: "";
+      width: 4px; height: 4px;
+      background: var(--ink-3);
+      border-radius: 50%;
+    }
+    .open-btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      transition: all 0.18s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .open-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .open-btn::after {
+      content: "→";
+      transition: transform 0.18s;
+    }
+    .open-btn:hover::after { transform: translateX(3px); }
+    .lab.todo .open-btn,
+    .lab.todo .duration { opacity: 0.4; }
+
+    /* ─────── Footer ─────── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding-top: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      letter-spacing: 0.02em;
+    }
+    footer .links { display: flex; gap: 18px; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; align-items: start; }
+      .hero h1 { font-size: 32px; }
+      .hero-stats { text-align: left; flex-direction: row; gap: 24px; }
+      .statusbar-inner { gap: 12px; }
+      .statusbar .seg + .seg { padding-left: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ───────── status bar ───────── -->
+  <div class="statusbar">
+    <div class="statusbar-inner">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div class="seg"><span class="pulse"></span><span class="val">{{ module.code }}</span></div>
+        <div class="seg"><span class="label">Instructor</span><span class="val">Paul Fergus</span></div>
+        <div class="seg"><span class="label">Labs</span><span class="val">{{ labs|length }}</span></div>
+      </div>
+      <div class="statusbar-right">
+        <a href="/about">about</a>
+        <a href="/annotator">annotator</a>
+        <a href="http://localhost:8888" target="_blank" rel="noopener">jupyterlab ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+
+    <!-- ───────── hero ───────── -->
+    <section class="hero">
+      <div>
+        <div class="hero-code">{{ module.code }} / Spring 2026</div>
+        <h1>{{ module.title }}</h1>
+        <p class="tagline">{{ module.tagline }}</p>
+      </div>
+      <div class="hero-stats">
+        <div class="num">{{ labs|length }}</div>
+        <div>sessions · weeks 1–{{ labs[-1].week }}</div>
+      </div>
+    </section>
+
+    <!-- ───────── lab grid ───────── -->
+    <div class="section-head">
+      <div class="section-title">Lab sessions</div>
+      <div class="section-sub">{{ labs|selectattr('status', 'equalto', 'ready')|list|length }} of {{ labs|length }} ready</div>
+    </div>
+
+    <div class="lab-grid">
+      {% for lab in labs %}
+      <article class="lab {{ lab.status }}">
+        <div class="lab-head">
+          <div>
+            <span class="lab-num">Lab&nbsp;{{ '%02d' % lab.number }}</span>
+            <span class="sep">·</span>
+            <span class="lab-week">Week {{ lab.week }}</span>
+          </div>
+          <span class="status-pill {{ lab.status }}">{{ lab.status }}</span>
+        </div>
+        <h3 class="lab-title">{{ lab.title }}</h3>
+        <p class="summary">{{ lab.summary }}</p>
+        {% if lab.topics %}
+        <div class="topic-row">
+          {% for t in lab.topics %}<span class="topic">{{ t }}</span>{% endfor %}
+        </div>
+        {% endif %}
+        <div class="lab-foot">
+          {% if lab.duration_min %}
+          <span class="duration">{{ lab.duration_min }} min</span>
+          {% else %}
+          <span class="duration" style="opacity:0.3;">—</span>
+          {% endif %}
+          {% if lab.url %}
+          <a class="open-btn" href="{{ lab.url }}" target="_blank" rel="noopener">Open</a>
+          {% else %}
+          <span style="opacity:0.3; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">pending</span>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <!-- ───────── footer ───────── -->
+    <footer>
+      <div>{{ module.code }} · Liverpool John Moores University</div>
+      <div class="links">
+        <a href="/about">About</a>
+        <a href="/annotator">Annotator</a>
+        <a href="http://localhost:8888" target="_blank" rel="noopener">JupyterLab</a>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

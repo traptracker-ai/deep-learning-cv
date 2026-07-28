@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="460" fill="#fdfdfb"/>
+
+  <!-- Title -->
+  <text x="450" y="32" text-anchor="middle" font-size="18" font-weight="600" fill="#111827">From classification to detection — one forward pass, more outputs</text>
+  <text x="450" y="52" text-anchor="middle" font-size="13" fill="#6b7280">YOLO's "you only look once" trick: predict every box and class in a single network pass.</text>
+
+  <!-- ============================== ROW 1: CLASSIFICATION ============================== -->
+  <g transform="translate(0, 80)">
+    <text x="60" y="22" font-size="13" font-weight="600" fill="#1f2937">Classification (Labs 3–5)</text>
+    <text x="60" y="40" font-size="11.5" fill="#6b7280">One label per image — answers "what".</text>
+
+    <!-- input image -->
+    <g transform="translate(60, 60)">
+      <rect x="0" y="0" width="100" height="100" fill="#cfe6ef" stroke="#1f2937" stroke-width="1.4"/>
+      <ellipse cx="40" cy="55" rx="22" ry="14" fill="#3f3a35"/>
+      <circle cx="25" cy="45" r="10" fill="#3f3a35"/>
+      <text x="50" y="115" text-anchor="middle" font-size="10" fill="#6b7280">image</text>
+    </g>
+
+    <!-- arrow to network -->
+    <line x1="170" y1="110" x2="220" y2="110" stroke="#374151" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- network blob -->
+    <g transform="translate(220, 70)">
+      <rect x="0" y="0" width="120" height="80" rx="4" fill="#fff" stroke="#1f2937" stroke-width="1.4"/>
+      <text x="60" y="36" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">CNN</text>
+      <text x="60" y="54" text-anchor="middle" font-size="10" fill="#6b7280">Lab 3-style</text>
+      <text x="60" y="95" text-anchor="middle" font-size="10" fill="#6b7280">forward pass</text>
+    </g>
+
+    <!-- arrow to output -->
+    <line x1="350" y1="110" x2="400" y2="110" stroke="#374151" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- output: single softmax -->
+    <g transform="translate(400, 60)">
+      <rect x="0" y="0" width="180" height="100" fill="#fff" stroke="#1f2937" stroke-width="1.4"/>
+      <text x="90" y="22" text-anchor="middle" font-size="11" fill="#6b7280" font-style="italic">softmax over 5 classes</text>
+      <!-- bars -->
+      <g transform="translate(15, 30)">
+        <rect x="0" y="0" width="22" height="50" fill="#d6336c" opacity="0.4"/>
+        <text x="11" y="65" text-anchor="middle" font-size="9" fill="#6b7280">badger</text>
+        <rect x="30" y="0" width="22" height="38" fill="#f59f00" opacity="0.4"/>
+        <text x="41" y="65" text-anchor="middle" font-size="9" fill="#6b7280">fox</text>
+        <rect x="60" y="0" width="22" height="14" fill="#2b8a3e" opacity="0.4"/>
+        <text x="71" y="65" text-anchor="middle" font-size="9" fill="#6b7280">deer</text>
+        <rect x="90" y="0" width="22" height="8" fill="#9a59f4" opacity="0.4"/>
+        <text x="101" y="65" text-anchor="middle" font-size="9" fill="#6b7280">hh</text>
+        <rect x="120" y="0" width="22" height="6" fill="#1c7ed6" opacity="0.4"/>
+        <text x="131" y="65" text-anchor="middle" font-size="9" fill="#6b7280">sqrl</text>
+      </g>
+    </g>
+
+    <!-- right column: answer -->
+    <line x1="590" y1="110" x2="640" y2="110" stroke="#374151" stroke-width="1.4" marker-end="url(#ar)"/>
+    <g transform="translate(640, 80)">
+      <text x="0" y="0" font-size="13" font-weight="600" fill="#1f2937">"This is a badger."</text>
+      <text x="0" y="20" font-size="11" fill="#6b7280">1 class id.</text>
+      <text x="0" y="40" font-size="11" fill="#6b7280">No location.</text>
+      <text x="0" y="58" font-size="11" fill="#6b7280">No count.</text>
+    </g>
+  </g>
+
+  <!-- separator line -->
+  <line x1="40" y1="245" x2="860" y2="245" stroke="#cbd5e1" stroke-width="1"/>
+
+  <!-- ============================== ROW 2: DETECTION ============================== -->
+  <g transform="translate(0, 265)">
+    <text x="60" y="22" font-size="13" font-weight="600" fill="#1f2937">Detection (Lab 7 — YOLO)</text>
+    <text x="60" y="40" font-size="11.5" fill="#6b7280">Variable number of boxes per image — answers "what, where, how many".</text>
+
+    <!-- input image with multiple animals -->
+    <g transform="translate(60, 60)">
+      <rect x="0" y="0" width="100" height="100" fill="#cfe6ef" stroke="#1f2937" stroke-width="1.4"/>
+      <ellipse cx="30" cy="60" rx="14" ry="9" fill="#3f3a35"/>
+      <circle cx="22" cy="54" r="6" fill="#3f3a35"/>
+      <ellipse cx="70" cy="65" rx="16" ry="9" fill="#a85a30"/>
+      <circle cx="62" cy="58" r="6" fill="#a85a30"/>
+      <ellipse cx="50" cy="30" rx="10" ry="7" fill="#7d6248"/>
+      <text x="50" y="115" text-anchor="middle" font-size="10" fill="#6b7280">image</text>
+    </g>
+
+    <!-- arrow -->
+    <line x1="170" y1="110" x2="220" y2="110" stroke="#374151" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- network -->
+    <g transform="translate(220, 70)">
+      <rect x="0" y="0" width="120" height="80" rx="4" fill="#fff" stroke="#1f2937" stroke-width="1.4"/>
+      <text x="60" y="32" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">YOLO26x</text>
+      <text x="60" y="50" text-anchor="middle" font-size="10" fill="#6b7280">single forward</text>
+      <text x="60" y="62" text-anchor="middle" font-size="10" fill="#6b7280">pass</text>
+      <text x="60" y="95" text-anchor="middle" font-size="10" fill="#a05a0c" font-style="italic">no NMS (end-to-end)</text>
+    </g>
+
+    <!-- arrow -->
+    <line x1="350" y1="110" x2="400" y2="110" stroke="#374151" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- output: list of boxes -->
+    <g transform="translate(400, 50)">
+      <rect x="0" y="0" width="200" height="120" fill="#fff" stroke="#1f2937" stroke-width="1.4"/>
+      <text x="100" y="18" text-anchor="middle" font-size="11" fill="#6b7280" font-style="italic">N predictions, each:</text>
+      <text x="10" y="40" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#1f2937">(cx, cy, w, h, class_id, conf)</text>
+      <!-- three rows of fake predictions -->
+      <g font-family="IBM Plex Mono, monospace" font-size="10">
+        <text x="10" y="62" fill="#d6336c">badger  0.30 0.60 0.28 0.18  0.92</text>
+        <text x="10" y="80" fill="#f59f00">fox     0.70 0.65 0.32 0.18  0.88</text>
+        <text x="10" y="98" fill="#7d6248">deer    0.50 0.30 0.20 0.14  0.71</text>
+      </g>
+    </g>
+
+    <!-- arrow -->
+    <line x1="610" y1="110" x2="650" y2="110" stroke="#374151" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- annotated output image -->
+    <g transform="translate(650, 60)">
+      <rect x="0" y="0" width="100" height="100" fill="#cfe6ef" stroke="#1f2937" stroke-width="1.4"/>
+      <ellipse cx="30" cy="60" rx="14" ry="9" fill="#3f3a35"/>
+      <circle cx="22" cy="54" r="6" fill="#3f3a35"/>
+      <rect x="13" y="46" width="34" height="24" fill="none" stroke="#d6336c" stroke-width="1.6"/>
+      <ellipse cx="70" cy="65" rx="16" ry="9" fill="#a85a30"/>
+      <circle cx="62" cy="58" r="6" fill="#a85a30"/>
+      <rect x="51" y="50" width="36" height="22" fill="none" stroke="#f59f00" stroke-width="1.6"/>
+      <ellipse cx="50" cy="30" rx="10" ry="7" fill="#7d6248"/>
+      <rect x="38" y="23" width="24" height="16" fill="none" stroke="#7d6248" stroke-width="1.6"/>
+      <text x="50" y="115" text-anchor="middle" font-size="10" fill="#6b7280">3 detections</text>
+    </g>
+  </g>
+
+  <!-- bottom tagline -->
+  <text x="450" y="445" text-anchor="middle" font-size="11.5" fill="#6b7280" font-style="italic">Same backbone idea (convolutions). New output head that produces boxes instead of a single softmax.</text>
+</svg>
