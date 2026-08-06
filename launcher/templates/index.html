@@ -5,455 +5,545 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ module.code }} · {{ module.title }}</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Distinctive typography: Fraunces for display, IBM Plex Sans for body, IBM Plex Mono for code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      --bg:           #0a0e14;
-      --bg-1:         #0f1620;
-      --bg-2:         #131c28;
-      --bg-3:         #1a2535;
-      --line:         #1f2b3c;
-      --line-2:       #2a3a52;
-      --ink:          #e6edf6;
-      --ink-2:        #b3becd;
-      --ink-3:        #7e8a9c;
-      --muted:        #5a6678;
-      --accent:       #22d3ee;
-      --accent-glow:  rgba(34, 211, 238, 0.15);
-      --accent-2:     #06b6d4;
-      --green:        #34d399;
-      --amber:        #fbbf24;
-      --rose:         #fb7185;
-      --sans:         'Inter', system-ui, -apple-system, sans-serif;
-      --mono:         'IBM Plex Mono', 'JetBrains Mono', monospace;
+      --ink:        #15161a;
+      --paper:      #f6f1e7;
+      --paper-2:    #ede5d2;
+      --rule:       #2a2b30;
+      --muted:      #6b6a64;
+      --accent:     #c0322b;      /* warm scholarly red */
+      --accent-ink: #7a1f1c;
+      --ok:         #2d6a3f;
+      --ok-bg:      #e3efd9;
+      --todo:       #8a7c5a;
+      --todo-bg:    #efe6c8;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
 
     html, body {
-      background: var(--bg);
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
       color: var(--ink);
-      font-family: var(--sans);
-      font-size: 15px;
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
     }
 
-    /* dot-grid background, very subtle */
-    body {
-      background-image:
-        radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 22px 22px;
-      background-position: 0 0;
+    /* Subtle paper grain */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.025) 1px, transparent 0);
+      background-size: 3px 3px;
+      mix-blend-mode: multiply;
+      z-index: 0;
     }
 
-    a { color: inherit; text-decoration: none; }
-    a:hover { color: var(--accent); }
-
-    /* ─────── Status bar (top, sticky) ─────── */
-    .statusbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(10, 14, 20, 0.85);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--line);
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      color: var(--ink-2);
-    }
-    .statusbar-inner {
-      max-width: 1280px;
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 0 28px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 28px;
+      padding: 56px 40px 80px;
     }
-    .statusbar .seg {
+
+    /* ---------- Masthead ---------- */
+    header.masthead {
+      border-top: 2px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+      padding: 14px 0 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .masthead .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: 0.5px;
+    }
+
+    .masthead-link {
+      color: var(--accent-ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 1px;
+      transition: color 160ms ease;
+    }
+
+    .masthead-link:hover {
+      color: var(--accent);
+    }
+
+    .masthead-sep {
+      margin: 0 10px;
+      color: var(--muted);
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 72px 0 56px;
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 48px;
+      align-items: end;
+    }
+
+    .module-code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: var(--accent-ink);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h1.title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 800;
+      font-size: clamp(48px, 7vw, 88px);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin: 0 0 22px;
+      font-variation-settings: "opsz" 120;
+    }
+
+    h1.title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+      font-variation-settings: "opsz" 120;
+    }
+
+    .tagline {
+      font-size: 18px;
+      max-width: 640px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .ornament {
+      font-family: 'Fraunces', serif;
+      font-size: 92px;
+      line-height: 1;
+      color: var(--accent);
+      opacity: 0.85;
+      transform: rotate(-6deg);
+      align-self: end;
+    }
+
+    /* ---------- Section heading ---------- */
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 64px 0 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .section-head h2 {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 28px;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    .section-head .meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ---------- Lab grid ---------- */
+    .labs {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+
+    .lab {
+      background: var(--paper);
+      padding: 28px 26px 26px;
+      display: flex;
+      flex-direction: column;
+      min-height: 280px;
+      position: relative;
+      transition: background 180ms ease;
+    }
+
+    .lab.ready:hover {
+      background: var(--paper-2);
+    }
+
+    .lab .lab-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .lab .lab-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 22px;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin: 0 0 14px;
+      color: var(--ink);
+    }
+
+    .lab.todo .lab-title {
+      color: var(--muted);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .lab .summary {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .topics {
+      margin: 18px 0 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .topic {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+      padding: 3px 8px;
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      color: var(--ink);
+    }
+
+    .lab-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--rule);
+    }
+
+    .lab-footer .duration {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--ink);
+      color: var(--paper);
+      text-decoration: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .open-btn:hover {
+      background: var(--accent);
+      transform: translateX(2px);
+    }
+
+    .open-btn .arr {
+      transition: transform 160ms ease;
+    }
+
+    .open-btn:hover .arr {
+      transform: translateX(3px);
+    }
+
+    .pending-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    .status-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+
+    .status-pill.ready { background: var(--ok-bg); color: var(--ok); }
+    .status-pill.todo  { background: var(--todo-bg); color: var(--todo); }
+
+    /* ---------- Infrastructure block ---------- */
+    .tools-row {
+      margin-top: 56px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: center;
+      padding: 28px 32px;
+      background: var(--ink);
+      color: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tools-row::before {
+      content: "§";
+      position: absolute;
+      right: -10px;
+      bottom: -40px;
+      font-family: 'Fraunces', serif;
+      font-size: 160px;
+      color: var(--accent);
+      opacity: 0.25;
+      line-height: 1;
+      transform: rotate(-8deg);
+      pointer-events: none;
+    }
+
+    .tools-row .tools-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(246, 241, 231, 0.6);
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .statusbar .seg + .seg { padding-left: 16px; border-left: 1px solid var(--line); }
-    .statusbar .label {
-      color: var(--ink-3);
-      text-transform: uppercase;
-      font-size: 10px;
-      letter-spacing: 0.12em;
-    }
-    .statusbar .val { color: var(--ink); }
-    .statusbar .pulse {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green);
-      animation: pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .statusbar-right { display: flex; gap: 14px; }
-    .statusbar a { color: var(--ink-2); transition: color 0.15s; }
-    .statusbar a:hover { color: var(--accent); }
 
-    /* ─────── Page shell ─────── */
-    .shell {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 56px 28px 80px;
+    .tools-row .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 6px var(--ok);
     }
 
-    /* ─────── Hero ─────── */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 32px;
-      align-items: end;
-      padding-bottom: 32px;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 40px;
+    .tools-row .tools-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 26px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin: 0 0 6px;
     }
-    .hero-code {
-      font-family: var(--mono);
-      font-size: 13px;
-      letter-spacing: 0.18em;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 14px;
+
+    .tools-row .tools-desc {
+      font-size: 14px;
+      color: rgba(246, 241, 231, 0.75);
+      max-width: 46em;
+      margin: 0;
+    }
+
+    .tools-row .tools-desc code {
+      background: rgba(246, 241, 231, 0.1);
+      padding: 1px 6px;
+      border-radius: 2px;
+    }
+
+    .tools-row .tools-cta {
+      position: relative;
+      z-index: 2;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-    }
-    .hero-code::before {
-      content: "";
-      width: 24px; height: 1px;
+      padding: 14px 22px;
       background: var(--accent);
-    }
-    .hero h1 {
-      font-family: var(--sans);
-      font-weight: 700;
-      font-size: 44px;
-      line-height: 1.1;
-      letter-spacing: -0.025em;
-      margin-bottom: 18px;
-      color: var(--ink);
-    }
-    .hero .tagline {
-      font-size: 17px;
-      color: var(--ink-2);
-      max-width: 720px;
-      line-height: 1.6;
-    }
-    .hero-stats {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      text-align: right;
-      font-family: var(--mono);
+      color: var(--paper);
+      text-decoration: none;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 12px;
-      color: var(--ink-3);
-    }
-    .hero-stats .num {
-      font-size: 28px;
-      color: var(--ink);
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-
-    /* ─────── Section heading ─────── */
-    .section-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin: 0 0 24px;
-      gap: 24px;
-    }
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--ink-3);
-      font-family: var(--mono);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .section-title::before {
-      content: "";
-      width: 18px; height: 1px;
-      background: var(--line-2);
-    }
-    .section-sub {
-      font-size: 13px;
-      color: var(--muted);
-      font-family: var(--mono);
+      font-weight: 500;
+      transition: background 160ms ease, transform 160ms ease;
+      white-space: nowrap;
     }
 
-    /* ─────── Lab grid ─────── */
-    .lab-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 14px;
-      margin-bottom: 56px;
-    }
-    .lab {
-      background: var(--bg-1);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 22px 22px 18px;
-      display: flex;
-      flex-direction: column;
-      transition: border-color 0.18s, background 0.18s, transform 0.18s;
-      position: relative;
-      overflow: hidden;
-    }
-    .lab::before {
-      content: "";
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 2px;
-      background: var(--line);
-      transition: background 0.2s;
-    }
-    .lab.ready::before { background: var(--accent); }
-    .lab.todo::before  { background: var(--amber); opacity: 0.6; }
-    .lab:hover {
-      border-color: var(--line-2);
-      background: var(--bg-2);
-    }
-    .lab.ready:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent), 0 8px 24px -8px var(--accent-glow);
-    }
-
-    .lab-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: 0.04em;
-    }
-    .lab-num {
+    .tools-row .tools-cta:hover {
+      background: var(--paper);
       color: var(--ink);
-      font-weight: 600;
+      transform: translateX(2px);
     }
-    .lab-num .sep { color: var(--muted); margin: 0 6px; }
-    .lab-week { color: var(--ink-3); }
-    .status-pill {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 3px;
-      border: 1px solid currentColor;
-    }
-    .status-pill.ready { color: var(--accent); }
-    .status-pill.todo  { color: var(--amber); }
 
-    .lab-title {
-      font-size: 17px;
-      font-weight: 600;
-      line-height: 1.3;
-      letter-spacing: -0.01em;
-      color: var(--ink);
-      margin-bottom: 10px;
-    }
-    .lab .summary {
-      font-size: 13.5px;
-      color: var(--ink-2);
-      line-height: 1.55;
-      margin-bottom: 16px;
-      flex: 1;
-    }
-    .topic-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-bottom: 18px;
-    }
-    .topic {
-      font-family: var(--mono);
-      font-size: 10.5px;
-      color: var(--ink-3);
-      background: var(--bg-2);
-      border: 1px solid var(--line);
-      padding: 2px 7px;
-      border-radius: 3px;
-      letter-spacing: 0.02em;
-    }
-    .lab-foot {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--ink-3);
-    }
-    .duration {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .duration::before {
-      content: "";
-      width: 4px; height: 4px;
-      background: var(--ink-3);
-      border-radius: 50%;
-    }
-    .open-btn {
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 6px 12px;
-      border: 1px solid var(--accent);
-      border-radius: 4px;
-      transition: all 0.18s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .open-btn:hover {
-      background: var(--accent);
-      color: var(--bg);
-    }
-    .open-btn::after {
-      content: "→";
-      transition: transform 0.18s;
-    }
-    .open-btn:hover::after { transform: translateX(3px); }
-    .lab.todo .open-btn,
-    .lab.todo .duration { opacity: 0.4; }
-
-    /* ─────── Footer ─────── */
+    /* ---------- Footer ---------- */
     footer {
-      border-top: 1px solid var(--line);
-      padding-top: 28px;
+      margin-top: 80px;
+      padding-top: 24px;
+      border-top: 1px solid var(--rule);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: 0.02em;
+      flex-wrap: wrap;
+      gap: 12px;
     }
-    footer .links { display: flex; gap: 18px; }
-    footer a:hover { color: var(--accent); }
 
-    @media (max-width: 760px) {
-      .hero { grid-template-columns: 1fr; align-items: start; }
-      .hero h1 { font-size: 32px; }
-      .hero-stats { text-align: left; flex-direction: row; gap: 24px; }
-      .statusbar-inner { gap: 12px; }
-      .statusbar .seg + .seg { padding-left: 8px; }
+    footer a {
+      color: var(--accent-ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent);
     }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 720px) {
+      .wrap { padding: 32px 22px 60px; }
+      .hero { grid-template-columns: 1fr; gap: 24px; }
+      .ornament { display: none; }
+      .section-head { flex-direction: column; gap: 6px; align-items: flex-start; }
+      .tools-row { grid-template-columns: 1fr; padding: 22px; gap: 18px; }
+      .tools-row::before { font-size: 110px; }
+    }
+
+    /* ---------- Entrance animation ---------- */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero, .labs, .tools-row { animation: rise 600ms ease both; }
+    .labs { animation-delay: 120ms; }
+    .tools-row { animation-delay: 240ms; }
   </style>
 </head>
 <body>
+  <div class="wrap">
 
-  <!-- ───────── status bar ───────── -->
-  <div class="statusbar">
-    <div class="statusbar-inner">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <div class="seg"><span class="pulse"></span><span class="val">{{ module.code }}</span></div>
-        <div class="seg"><span class="label">Instructor</span><span class="val">Paul Fergus</span></div>
-        <div class="seg"><span class="label">Labs</span><span class="val">{{ labs|length }}</span></div>
+    <header class="masthead">
+      <div><span class="dot"></span>{{ module.code }} · Module Container</div>
+      <div>
+        <a href="/about" class="masthead-link">About your module leader</a>
+        <span class="masthead-sep">·</span>
+        <a href="/annotator" class="masthead-link">Annotator</a>
+        <span class="masthead-sep">·</span>
+        Liverpool John Moores University
       </div>
-      <div class="statusbar-right">
-        <a href="/about">about</a>
-        <a href="/annotator">annotator</a>
-        <a href="http://localhost:8888" target="_blank" rel="noopener">jupyterlab ↗</a>
-      </div>
-    </div>
-  </div>
+    </header>
 
-  <div class="shell">
-
-    <!-- ───────── hero ───────── -->
     <section class="hero">
       <div>
-        <div class="hero-code">{{ module.code }} / Spring 2026</div>
-        <h1>{{ module.title }}</h1>
+        <div class="module-code">{{ module.code }}</div>
+        <h1 class="title">Deep Learning Concepts &amp;<br/><em>Techniques</em></h1>
         <p class="tagline">{{ module.tagline }}</p>
       </div>
-      <div class="hero-stats">
-        <div class="num">{{ labs|length }}</div>
-        <div>sessions · weeks 1–{{ labs[-1].week }}</div>
-      </div>
+      <div class="ornament">§</div>
     </section>
 
-    <!-- ───────── lab grid ───────── -->
     <div class="section-head">
-      <div class="section-title">Lab sessions</div>
-      <div class="section-sub">{{ labs|selectattr('status', 'equalto', 'ready')|list|length }} of {{ labs|length }} ready</div>
+      <h2>Laboratory programme</h2>
+      <div class="meta">{{ labs|length }} sessions · weeks 1–{{ labs[-1].week }}</div>
     </div>
 
-    <div class="lab-grid">
+    <div class="labs">
       {% for lab in labs %}
       <article class="lab {{ lab.status }}">
-        <div class="lab-head">
-          <div>
-            <span class="lab-num">Lab&nbsp;{{ '%02d' % lab.number }}</span>
-            <span class="sep">·</span>
-            <span class="lab-week">Week {{ lab.week }}</span>
-          </div>
+        <div class="lab-num">
+          <span>Lab {{ '%02d' % lab.number }} &nbsp;·&nbsp; Week {{ lab.week }}</span>
           <span class="status-pill {{ lab.status }}">{{ lab.status }}</span>
         </div>
         <h3 class="lab-title">{{ lab.title }}</h3>
         <p class="summary">{{ lab.summary }}</p>
+
         {% if lab.topics %}
-        <div class="topic-row">
+        <div class="topics">
           {% for t in lab.topics %}<span class="topic">{{ t }}</span>{% endfor %}
         </div>
         {% endif %}
-        <div class="lab-foot">
+
+        <div class="lab-footer">
           {% if lab.duration_min %}
           <span class="duration">{{ lab.duration_min }} min</span>
           {% else %}
-          <span class="duration" style="opacity:0.3;">—</span>
+          <span></span>
           {% endif %}
+
           {% if lab.url %}
-          <a class="open-btn" href="{{ lab.url }}" target="_blank" rel="noopener">Open</a>
+          <a class="open-btn" href="{{ lab.url }}" target="_blank" rel="noopener">
+            Open <span class="arr">→</span>
+          </a>
           {% else %}
-          <span style="opacity:0.3; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">pending</span>
+          <span class="pending-label">pending</span>
           {% endif %}
         </div>
       </article>
       {% endfor %}
     </div>
 
-    <!-- ───────── footer ───────── -->
-    <footer>
-      <div>{{ module.code }} · Liverpool John Moores University</div>
-      <div class="links">
-        <a href="/about">About</a>
-        <a href="/annotator">Annotator</a>
-        <a href="http://localhost:8888" target="_blank" rel="noopener">JupyterLab</a>
+    <section class="tools-row">
+      <div>
+        <div class="tools-meta">
+          <span class="status-dot"></span>
+          Infrastructure · JupyterLab
+        </div>
+        <h2 class="tools-title">Every lab runs against a local JupyterLab server</h2>
+        <p class="tools-desc">
+          Each notebook link above opens straight into JupyterLab at <code>localhost:8888</code>, already authenticated. Lab&nbsp;7 onward trains and evaluates YOLO26 models and needs a CUDA GPU passed through to the container.
+        </p>
       </div>
+      <a class="tools-cta" href="http://localhost:8888" target="_blank" rel="noopener">
+        Open JupyterLab <span>→</span>
+      </a>
+    </section>
+
+    <footer>
+      <div>Container: 7144comp/deep-learning</div>
+      <div>Jupyter: <a href="http://localhost:8888" target="_blank" rel="noopener">localhost:8888</a></div>
+      <div>Stop the container in your terminal with <code>docker compose down</code></div>
     </footer>
 
   </div>
-
 </body>
 </html>
