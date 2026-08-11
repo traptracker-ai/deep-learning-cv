@@ -35,7 +35,7 @@ ANNOTATOR_DATA_DIR = WORKSPACE / "labs" / "lab06_image_annotation" / "data"
 ANNOTATOR_IMAGES_DIR = ANNOTATOR_DATA_DIR / "images"
 ANNOTATOR_LABELS_DIR = ANNOTATOR_DATA_DIR / "labels"
 
-DEFAULT_CLASSES = ["badger", "fox", "deer", "hedgehog", "squirrel"]
+DEFAULT_CLASSES = ["buffalo", "elephant", "rhino", "zebra"]
 
 # Image filename validation — only allow simple alphanumeric + dot/underscore/dash.
 SAFE_NAME = re.compile(r"^[A-Za-z0-9_.-]+\.(jpg|jpeg|png)$")

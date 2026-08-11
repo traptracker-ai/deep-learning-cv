@@ -44,4 +44,14 @@ onnxruntime==1.20.1
 # is a maintained PyPI package that provides the same `clip` import module.
 clip-anytorch==2.6.0
 ftfy==6.2.3
-regex==2024.11.6
+# Bumped from 2024.11.6 for Lab 15: transformers==5.15.0 requires regex>=2025.10.22.
+# clip-anytorch/ftfy only need *a* regex, no upper bound, so raising this is safe.
+regex==2026.7.19
+
+# --- Lab 15: diffusion models (Stable Diffusion v1.5 via Hugging Face) ---
+# The only lab that needs packages beyond what earlier labs already installed.
+# transformers here is Hugging Face's library (a different package from the
+# `clip` module Lab 9 uses, despite both dealing with text encoders).
+diffusers==0.39.0
+transformers==5.15.0
+accelerate==1.14.0

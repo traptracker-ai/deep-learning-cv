@@ -16,7 +16,7 @@
 # through to the container — that's the `deploy.resources` block below.
 #
 # Prerequisites on the host:
-#   1. Recent NVIDIA driver (>=550 for CUDA 12.4)
+#   1. Recent NVIDIA driver (>=570.65 on Windows / >=570.26 on Linux, for CUDA 12.8)
 #   2. Docker Desktop (Windows/macOS) or Docker Engine (Linux)
 #   3. WSL2 backend (Windows) — default with modern Docker Desktop
 #   4. NVIDIA Container Toolkit — auto-installed by Docker Desktop on Windows;

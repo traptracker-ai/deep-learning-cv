@@ -17,14 +17,19 @@
 # slim Python base).
 #
 # Version notes:
-#   - CUDA 12.4 + cuDNN 9 + Ubuntu 22.04: matches the requirements of
-#     PyTorch 2.4+ and Ultralytics 26.x. Works with Ampere (RTX 30xx),
-#     Ada (RTX 40xx), and Blackwell (RTX 50xx) consumer GPUs.
+#   - CUDA 12.8 + cuDNN + Ubuntu 22.04: matches the requirements of
+#     PyTorch 2.7+ and Ultralytics 26.x. CUDA 12.8 is the minimum needed
+#     for Blackwell (RTX 50xx, compute capability sm_120) support - an
+#     earlier attempt at CUDA 12.4 built fine but PyTorch 2.4.1 has no
+#     sm_120 kernels at all, so it fails at the first GPU op (not at
+#     import time) with "no kernel image is available for execution on
+#     the device". CUDA 12.8 remains fully backward compatible with
+#     Ampere (RTX 30xx) and Ada (RTX 40xx) too.
 #   - We use the `devel` tag (not `runtime`) because some Python ML
 #     packages still build CUDA code at install time.
 # ------------------------------------------------------------
 
-FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04 AS base
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -87,7 +92,7 @@ WORKDIR /workspace
 # constraints file says "IF this package is installed, it must be exactly
 # this version" — it doesn't install anything itself, but it caps what
 # any dependency resolution is allowed to choose. So when ultralytics
-# asks for torch>=1.8, pip is forced to keep our 2.4.1+cu124 build
+# asks for torch>=1.8, pip is forced to keep our 2.11.0+cu128 build
 # rather than pulling a newer CPU/cu13x wheel from PyPI.
 #
 # Note on `--ignore-installed blinker`: the Ubuntu CUDA base image ships
@@ -97,18 +102,18 @@ WORKDIR /workspace
 COPY requirements.txt /tmp/requirements.txt
 
 # Hard pins that nothing downstream is allowed to move. We use the base
-# version (no +cu124 suffix) — pip matches 2.4.1 against the installed
-# 2.4.1+cu124 fine, and this avoids local-version matching quirks.
+# version (no +cu128 suffix) — pip matches 2.11.0 against the installed
+# 2.11.0+cu128 fine, and this avoids local-version matching quirks.
 RUN printf '%s\n' \
-        'torch==2.4.1' \
-        'torchvision==0.19.1' \
+        'torch==2.11.0' \
+        'torchvision==0.26.0' \
         'numpy==1.26.4' \
         > /tmp/constraints.txt
 
 # The install sequence below is ordered deliberately:
 #   1. Purge every numpy the base image shipped (may be >1, via OS + pip).
-#   2. Install pinned numpy 1.x FIRST — torch 2.4.1 was compiled against
-#      numpy 1.x and breaks at runtime under numpy 2.x (the
+#   2. Install pinned numpy 1.x FIRST — these PyTorch wheels were compiled
+#      against numpy 1.x and break at runtime under numpy 2.x (the
 #      '_signature_descriptor' error that also poisons CUDA init).
 #   3. Install the CUDA build of torch from the PyTorch index.
 #   4. Install everything else UNDER the constraint file so nothing —
@@ -120,19 +125,19 @@ RUN pip install --upgrade pip \
     && (pip uninstall -y numpy 2>/dev/null || true) \
     && (pip uninstall -y numpy 2>/dev/null || true) \
     && pip install "numpy==1.26.4" \
-    && pip install --index-url https://download.pytorch.org/whl/cu124 \
-        torch==2.4.1 torchvision==0.19.1 \
+    && pip install --index-url https://download.pytorch.org/whl/cu128 \
+        torch==2.11.0 torchvision==0.26.0 \
     && pip install \
         --constraint /tmp/constraints.txt \
-        --extra-index-url https://download.pytorch.org/whl/cu124 \
+        --extra-index-url https://download.pytorch.org/whl/cu128 \
         --ignore-installed blinker \
         -r /tmp/requirements.txt \
     && pip install --force-reinstall --no-deps "numpy==1.26.4" \
-    && python -c "import numpy as np; import torch; import clip; \
+    && python -c "import numpy as np; import torch; import clip; import diffusers; import transformers; \
 assert np.__version__.startswith('1.26'), 'numpy is '+np.__version__; \
-assert torch.__version__.startswith('2.4.1'), 'torch is '+torch.__version__; \
+assert torch.__version__.startswith('2.11.0'), 'torch is '+torch.__version__; \
 x = torch.from_numpy(np.zeros(3, dtype=np.float32)); \
-print('Build pins OK - torch', torch.__version__, '| numpy', np.__version__, '| clip OK | bridge works')"
+print('Build pins OK - torch', torch.__version__, '| numpy', np.__version__, '| clip OK | diffusers', diffusers.__version__, '| transformers', transformers.__version__, '| bridge works')"
 
 # Copy the rest of the module content. Note: when running via docker-compose,
 # the labs/ folder is bind-mounted over this, so student edits persist on the host.

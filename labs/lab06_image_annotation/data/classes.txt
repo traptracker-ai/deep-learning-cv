@@ -1,5 +1,4 @@
-badger
-fox
-deer
-hedgehog
-squirrel
+buffalo
+elephant
+rhino
+zebra

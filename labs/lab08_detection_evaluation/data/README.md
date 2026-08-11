@@ -15,6 +15,6 @@ has never seen, sourced independently of training.
   produced by annotating each image in the Lab 6 annotator. These are your
   *ground truth* — the hand-verified correct answers the model is judged against.
 
-Class order (must match Lab 6/7): `0 badger, 1 fox, 2 deer, 3 hedgehog, 4 squirrel`.
+Class order (must match Lab 6/7): `0 buffalo, 1 elephant, 2 rhino, 3 zebra`.
 
 See Section 2 of `lab08.ipynb` for the full sourcing-and-annotating walkthrough.
