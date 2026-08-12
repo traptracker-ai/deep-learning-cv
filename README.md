@@ -1,3 +1,5 @@
+© 2026 Paul Fergus
+
 # 7144COMP — Deep Learning Concepts and Techniques
 
 Module container for the lab programme. Build once, then open one URL to access every lab.
