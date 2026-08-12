@@ -18,9 +18,13 @@ scikit-learn==1.5.2
 seaborn==0.13.2
 
 # --- Jupyter + launcher ---
-jupyterlab==4.2.5
-notebook==7.2.2
-flask==3.0.3
+# Bumped from 4.2.5/7.2.2/3.0.3 to clear GitHub Dependabot alerts: several
+# High-severity jupyterlab/notebook XSS and command-execution CVEs (CommandLinker
+# one-click RCE, extension-manager stored XSS, auth-token theft), plus Flask's
+# missing Vary: Cookie header (GHSA-68rp-wp8r-4726). All three are latest-stable.
+jupyterlab==4.6.3
+notebook==7.6.2
+flask==3.1.3
 
 # --- Lab 1 specific ---
 # (nothing extra; uses the core stack only)
@@ -34,7 +38,13 @@ pyyaml==6.0.2
 # haven't been tested against the lab notebooks.
 ultralytics==8.4.45
 opencv-python-headless==4.10.0.84
-onnx==1.17.0
+# Bumped from 1.17.0 to clear GitHub Dependabot alerts: several High/Moderate
+# onnx CVEs (symlink/hardlink path traversal in external-data loading, TOCTOU
+# file read/write, silently-suppressed untrusted-model-repo warnings, a
+# null-pointer crash and a heap-buffer-overflow read in converter code).
+# ultralytics' onnx upper bound (<1.18.0) is macOS-only; this container is
+# Linux, so it isn't constrained by that cap.
+onnx==1.22.0
 onnxruntime==1.20.1
 
 # --- Lab 9: zero-shot open-vocabulary detection (YOLOE text prompts) ---

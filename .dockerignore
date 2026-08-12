@@ -32,3 +32,39 @@ desktop.ini
 # Build artefacts
 *.log
 *.tmp
+
+# Large model weights/checkpoints — labs download these at runtime into the
+# bind-mounted labs/ folder; baking them into the image is unnecessary and,
+# for Hugging Face's hf_cache in particular, its symlinked snapshot/blob
+# layout breaks the build-context transfer outright.
+*.pt
+*.pth
+*.h5
+*.onnx
+*.weights
+*.ts
+**/hf_cache/
+
+# Downloaded/generated data, working copies, and training runs — each lab's
+# notebook rebuilds these on demand at runtime via the labs/ bind mount, so
+# baking them into the image just bloats the build context for no benefit.
+labs/lab03_cnn_mnist/data/
+labs/lab04_cifar10_augmentation/data/
+labs/lab06_image_annotation/data/full_dataset/
+labs/lab06_image_annotation/data/images/train/
+labs/lab06_image_annotation/data/images/val/
+labs/lab06_image_annotation/data/images/test/
+labs/lab06_image_annotation/data/labels/
+labs/lab06_image_annotation/data/temp/
+labs/lab07_yolo_training/runs/
+labs/lab08_detection_evaluation/data/holdout_images/
+labs/lab08_detection_evaluation/data/holdout_labels/
+labs/lab10_instance_segmentation/data/
+labs/lab10_instance_segmentation/runs/
+labs/lab11_explainability/data/
+labs/lab12_vision_transformers/data/
+labs/lab14_generative_models/data/
+labs/lab15_diffusion_models/data/
+
+# Stray filesystem trash from the WSL2 bind mount
+labs/.Trash-*/
