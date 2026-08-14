@@ -1,6 +1,6 @@
-© 2026 Paul Fergus
+© 2026 Paul Fergus. Free for student and research use — commercial use is strictly prohibited.
 
-# 7144COMP — Deep Learning Concepts and Techniques
+# 7144COMP — Deep Learning Concepts and Techniques (Computer Vision)
 
 Module container for the lab programme. Build once, then open one URL to access every lab.
 

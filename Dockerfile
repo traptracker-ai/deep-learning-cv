@@ -1,5 +1,5 @@
 # ============================================================
-# 7144COMP Deep Learning Concepts and Techniques
+# 7144COMP Deep Learning Concepts and Techniques (Computer Vision)
 # Single container with all module labs and a launcher entry point.
 # ============================================================
 #

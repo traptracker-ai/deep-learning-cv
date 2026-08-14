@@ -7,7 +7,7 @@ The launcher reads it at startup.
 
 MODULE_INFO = {
     "code": "7144COMP",
-    "title": "Deep Learning Concepts and Techniques",
+    "title": "Deep Learning Concepts and Techniques (Computer Vision)",
     "tagline": "Fifteen hands-on labs from a perceptron in numpy to training YOLO26, zero-shot detection, instance segmentation, explainability, Vision Transformers, CLIP, generative models, and diffusion.",
 }
 
