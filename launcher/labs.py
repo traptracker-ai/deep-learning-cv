@@ -65,10 +65,10 @@ LABS = [
     {
         "number": 6,
         "title": "Annotating images for object detection",
-        "summary": "Annotate real African wildlife photos in YOLO format using the built-in bounding-box tool, then inherit the full 1,504-image dataset behind them for the YOLO training lab.",
+        "summary": "Annotate a full pool of real wildlife photos in YOLO format using the built-in bounding-box tool, over the course of a week — this becomes the dataset the YOLO training lab trains on.",
         "topics": ["object detection", "YOLO format", "annotation", "bounding boxes", "data.yaml"],
         "week": 6,
-        "duration_min": 180,
+        "duration_min": None,
         "notebook": "labs/lab06_image_annotation/lab06.ipynb",
         "status": "ready",
     },
@@ -135,7 +135,7 @@ LABS = [
     {
         "number": 13,
         "title": "Inside CLIP: contrastive learning and multi-modal retrieval",
-        "summary": "Open up the CLIP model Lab 9's YOLOE used as a black box: build the contrastive loss from first principles, run zero-shot whole-image classification with no training, and build a working text-to-image search engine over the African Wildlife photos.",
+        "summary": "Open up the CLIP model Lab 9's YOLOE used as a black box: build the contrastive loss from first principles, run zero-shot whole-image classification with no training, and build a working text-to-image search engine over the wildlife photos.",
         "topics": ["CLIP", "contrastive learning", "embeddings", "zero-shot classification", "multi-modal retrieval", "cosine similarity"],
         "week": 13,
         "duration_min": 210,

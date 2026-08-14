@@ -142,6 +142,26 @@
       margin: 8px 4px 12px;
     }
 
+    .next-unlabelled-btn {
+      display: block;
+      width: 100%;
+      margin: 0 0 10px;
+      padding: 7px 10px;
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      color: var(--accent-ink);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 120ms;
+    }
+
+    .next-unlabelled-btn:hover { background: var(--paper-2); }
+    .next-unlabelled-btn:disabled { opacity: 0.4; cursor: default; }
+
     .thumb {
       display: flex;
       gap: 10px;
@@ -462,6 +482,7 @@
 
     <aside class="images-pane">
       <div class="pane-heading">Images <span id="progress-count" style="color:var(--done);font-weight:500;"></span></div>
+      <button class="next-unlabelled-btn" id="next-unlabelled-btn" title="Jump to the next unlabelled image (N)">Next unlabelled →</button>
       <div id="thumbs-list"></div>
     </aside>
 
@@ -482,6 +503,7 @@
         <span><kbd>Wheel</kbd> zoom</span>
         <span><kbd>Shift + drag</kbd> pan</span>
         <span><kbd>←</kbd> <kbd>→</kbd> image</span>
+        <span><kbd>N</kbd> next unlabelled</span>
         <span><kbd>Del</kbd> delete</span>
         <span><kbd>Esc</kbd> deselect</span>
       </div>
@@ -560,6 +582,7 @@
   const zoomOutBtn = document.getElementById("zoom-out-btn");
   const zoomResetBtn = document.getElementById("zoom-reset-btn");
   const zoomLevelEl = document.getElementById("zoom-level");
+  const nextUnlabelledBtn = document.getElementById("next-unlabelled-btn");
 
   // ===================================================================
   // Helpers
@@ -648,6 +671,28 @@
   }
 
   // ===================================================================
+  // Jump to next unlabelled image — at 1,500+ images, scrolling the
+  // thumbnail list by hand between sessions isn't practical.
+  // ===================================================================
+
+  function jumpToNextUnlabelled() {
+    if (!state.images.length) return;
+    const startIdx = Math.max(0, state.images.findIndex(i => i.name === state.currentImage));
+    for (let step = 1; step <= state.images.length; step++) {
+      const idx = (startIdx + step) % state.images.length;
+      if (state.images[idx].n_boxes === 0) {
+        loadImage(state.images[idx].name);
+        return;
+      }
+    }
+    const original = nextUnlabelledBtn.textContent;
+    nextUnlabelledBtn.textContent = "All images labelled";
+    setTimeout(() => { nextUnlabelledBtn.textContent = original; }, 1500);
+  }
+
+  nextUnlabelledBtn.addEventListener("click", jumpToNextUnlabelled);
+
+  // ===================================================================
   // Initial load
   // ===================================================================
 
@@ -703,7 +748,7 @@
         ? `<span class="thumb-status has-boxes">${img.n_boxes} box${img.n_boxes === 1 ? "" : "es"}</span>`
         : `<span class="thumb-status">unlabelled</span>`;
       div.innerHTML = `
-        <img src="/annotator/api/image/${encodeURIComponent(img.name)}" alt="" />
+        <img src="/annotator/api/image/${encodeURIComponent(img.name)}" alt="" loading="lazy" />
         <div class="thumb-meta">
           <span class="thumb-name">${img.name}</span>
           ${status}
@@ -1201,6 +1246,10 @@
       if (next < 0) next = state.images.length - 1;
       if (next >= state.images.length) next = 0;
       loadImage(state.images[next].name);
+      return;
+    }
+    if (e.key === "n" || e.key === "N") {
+      jumpToNextUnlabelled();
       return;
     }
     // Zoom shortcuts

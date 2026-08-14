@@ -40,7 +40,7 @@ desktop.ini
 # notebook rebuilds these on demand, so they don't belong in source control.
 labs/lab03_cnn_mnist/data/
 labs/lab04_cifar10_augmentation/data/
-labs/lab06_image_annotation/data/full_dataset/
+labs/lab06_image_annotation/data/_instructor_only_ground_truth/
 labs/lab06_image_annotation/data/images/train/
 labs/lab06_image_annotation/data/images/val/
 labs/lab06_image_annotation/data/images/test/

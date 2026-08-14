@@ -1,0 +1,9 @@
+path: /workspace/labs/lab06_image_annotation/data
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: buffalo
+  1: elephant
+  2: rhino
+  3: zebra
