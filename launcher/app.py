@@ -1,5 +1,5 @@
 """
-7144COMP Deep Learning — module launcher
+Deep Learning — module launcher
 =========================================
 
 A small Flask app that serves:
@@ -47,7 +47,7 @@ SAFE_NAME = re.compile(r"^[A-Za-z0-9_.-]+\.(jpg|jpeg|png)$")
 
 def jupyter_url(notebook_path: str) -> str:
     """Build a URL that opens a specific notebook in JupyterLab."""
-    token = os.environ.get("JUPYTER_TOKEN", "7144comp")
+    token = os.environ.get("JUPYTER_TOKEN", "deep-learning-cv")
     safe_path = quote(notebook_path.lstrip("/"))
     return f"http://localhost:8888/lab/tree/{safe_path}?token={token}"
 

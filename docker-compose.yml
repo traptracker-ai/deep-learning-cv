@@ -1,5 +1,5 @@
 # ============================================================
-# 7144COMP Deep Learning — docker-compose
+# Deep Learning — docker-compose
 # ============================================================
 # Quick start (Windows / PowerShell or macOS / Linux terminal):
 #
@@ -32,8 +32,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 7144comp/deep-learning:latest
-    container_name: 7144comp
+    image: deep-learning-cv:latest
+    container_name: deep-learning-cv
     ports:
       - "8000:8000"   # launcher
       - "8888:8888"   # JupyterLab (direct access if needed)
@@ -45,7 +45,7 @@ services:
       # (and the solutions/ folder) before zipping a student-facing release.
       - ./solutions:/workspace/solutions
     environment:
-      - JUPYTER_TOKEN=7144comp
+      - JUPYTER_TOKEN=deep-learning-cv
       # Tell Ultralytics not to write to /root or send telemetry.
       - YOLO_OFFLINE=true
       - YOLO_CONFIG_DIR=/workspace/.ultralytics

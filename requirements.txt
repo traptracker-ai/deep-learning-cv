@@ -1,5 +1,5 @@
 # ============================================================
-# 7144COMP Deep Learning — container requirements
+# Deep Learning — container requirements
 # ============================================================
 # This file is grown lab-by-lab as new dependencies are needed.
 # Pin versions to keep the module reproducible across the cohort.

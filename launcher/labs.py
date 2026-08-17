@@ -1,12 +1,12 @@
 """
-Lab catalogue for the 7144COMP launcher.
+Lab catalogue for the module launcher.
 
 Edit this file to add new labs, mark them as ready, or update descriptions.
 The launcher reads it at startup.
 """
 
 MODULE_INFO = {
-    "code": "7144COMP",
+    "code": "deep-learning-cv",
     "title": "Deep Learning Concepts and Techniques (Computer Vision)",
     "tagline": "Fifteen hands-on labs from a perceptron in numpy to training YOLO26, zero-shot detection, instance segmentation, explainability, Vision Transformers, CLIP, generative models, and diffusion.",
 }

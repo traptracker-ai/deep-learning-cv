@@ -1,6 +1,6 @@
 © 2026 Paul Fergus. Free for student and research use — commercial use is strictly prohibited.
 
-# 7144COMP — Deep Learning Concepts and Techniques (Computer Vision)
+# Deep Learning Concepts and Techniques (Computer Vision)
 
 Module container for the lab programme. Build once, then open one URL to access every lab.
 
@@ -21,8 +21,8 @@ The first build will take 5–10 minutes. Subsequent starts are near-instant.
 When you see lines like:
 
 ```
-7144comp  | * Running on all addresses (0.0.0.0)
-7144comp  | * Running on http://127.0.0.1:8000
+deep-learning-cv  | * Running on all addresses (0.0.0.0)
+deep-learning-cv  | * Running on http://127.0.0.1:8000
 ```
 
 open your browser to:
@@ -42,7 +42,7 @@ docker compose down
 ## What's inside
 
 ```
-7144COMP-deep-learning/
+deep-learning-cv/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── docker-entrypoint.sh
@@ -82,7 +82,7 @@ The `labs/` folder is bind-mounted, which means **your edits to notebooks persis
 
 The launcher is the recommended entry point, but if you want to skip it and go straight to JupyterLab:
 
-> **http://localhost:8888/lab?token=7144comp**
+> **http://localhost:8888/lab?token=deep-learning-cv**
 
 ---
 

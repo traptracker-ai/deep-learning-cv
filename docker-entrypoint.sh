@@ -1,15 +1,15 @@
 #!/bin/bash
 # ============================================================
-# 7144COMP container entrypoint
+# Container entrypoint
 # Starts JupyterLab in the background and the launcher in the foreground.
 # The launcher is the single entry point students hit at http://localhost:8000.
 # ============================================================
 set -euo pipefail
 
-JUPYTER_TOKEN="${JUPYTER_TOKEN:-7144comp}"
+JUPYTER_TOKEN="${JUPYTER_TOKEN:-deep-learning-cv}"
 
 echo "================================================================"
-echo " 7144COMP Deep Learning — module container"
+echo " Deep Learning — module container"
 echo "================================================================"
 echo " Launcher:   http://localhost:8000"
 echo " JupyterLab: http://localhost:8888  (token: ${JUPYTER_TOKEN})"
