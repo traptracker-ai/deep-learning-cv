@@ -35,8 +35,6 @@ ANNOTATOR_DATA_DIR = WORKSPACE / "labs" / "lab06_image_annotation" / "data"
 ANNOTATOR_IMAGES_DIR = ANNOTATOR_DATA_DIR / "images"
 ANNOTATOR_LABELS_DIR = ANNOTATOR_DATA_DIR / "labels"
 
-DEFAULT_CLASSES = ["buffalo", "elephant", "rhino", "zebra"]
-
 # Image filename validation — only allow simple alphanumeric + dot/underscore/dash.
 SAFE_NAME = re.compile(r"^[A-Za-z0-9_.-]+\.(jpg|jpeg|png)$")
 
@@ -53,13 +51,11 @@ def jupyter_url(notebook_path: str) -> str:
 
 
 def load_classes() -> list[str]:
-    """Read the class list from disk, falling back to defaults if missing."""
+    """Read the class list from data/classes.txt. Empty if the dataset has none yet."""
     classes_file = ANNOTATOR_DATA_DIR / "classes.txt"
     if classes_file.is_file():
-        names = [ln.strip() for ln in classes_file.read_text().splitlines() if ln.strip()]
-        if names:
-            return names
-    return list(DEFAULT_CLASSES)
+        return [ln.strip() for ln in classes_file.read_text().splitlines() if ln.strip()]
+    return []
 
 
 def list_images() -> list[str]:
