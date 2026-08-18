@@ -3,6 +3,9 @@
 .gitignore
 .gitattributes
 
+# Local dev-tool config — not part of the course image
+.claude
+
 # Python
 __pycache__
 *.pyc

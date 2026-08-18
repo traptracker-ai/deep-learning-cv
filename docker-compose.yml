@@ -41,9 +41,6 @@ services:
       # Bind-mount the labs folder so student edits persist on the host.
       # On Windows this works out of the box with Docker Desktop + WSL2.
       - ./labs:/workspace/labs
-      # INSTRUCTOR-ONLY — worked solutions for marking. Remove this line
-      # (and the solutions/ folder) before zipping a student-facing release.
-      - ./solutions:/workspace/solutions
     environment:
       - JUPYTER_TOKEN=deep-learning-cv
       # Tell Ultralytics not to write to /root or send telemetry.
