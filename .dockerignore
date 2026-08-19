@@ -54,6 +54,9 @@ desktop.ini
 labs/lab03_cnn_mnist/data/
 labs/lab04_cifar10_augmentation/data/
 labs/lab06_image_annotation/data/_instructor_only_ground_truth/
+# The unlabelled photo pool itself — not bundled (size/licensing), your
+# instructor provides it separately. See data/images/README.md.
+labs/lab06_image_annotation/data/images/*.jpg
 labs/lab06_image_annotation/data/images/train/
 labs/lab06_image_annotation/data/images/val/
 labs/lab06_image_annotation/data/images/test/
