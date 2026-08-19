@@ -8,6 +8,18 @@ set -euo pipefail
 
 JUPYTER_TOKEN="${JUPYTER_TOKEN:-deep-learning-cv}"
 
+# --- Seed an empty bind-mounted labs/ folder on first run ---
+# If you pulled this image from Docker Hub and bind-mounted a fresh local
+# folder onto /workspace/labs, the mount hides whatever was baked into the
+# image at that path — you'd otherwise start with an empty labs/ and no
+# notebooks. Populate it once from the pristine copy kept at /opt/labs-seed
+# (see Dockerfile). Never touches a labs/ folder that already has content,
+# so this is safe to leave in place across every later restart.
+if [ -d /opt/labs-seed ] && [ -z "$(ls -A /workspace/labs 2>/dev/null)" ]; then
+    echo "labs/ is empty — copying in the lab content (first run)..."
+    cp -r /opt/labs-seed/. /workspace/labs/
+fi
+
 echo "================================================================"
 echo " Deep Learning — module container"
 echo "================================================================"

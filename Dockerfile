@@ -143,6 +143,13 @@ print('Build pins OK - torch', torch.__version__, '| numpy', np.__version__, '| 
 # the labs/ folder is bind-mounted over this, so student edits persist on the host.
 COPY --chown=${USERNAME}:${USERNAME} . /workspace
 
+# A pristine copy of labs/, kept outside /workspace so a bind mount over
+# /workspace/labs can't hide it. docker-entrypoint.sh uses this to seed an
+# empty (or freshly-created) bind-mounted labs/ folder on first run — this is
+# what makes `docker pull` + an empty local folder behave the same as cloning
+# the GitHub repo, where labs/ already had content before the mount happened.
+RUN cp -r /workspace/labs /opt/labs-seed
+
 RUN chmod +x /workspace/docker-entrypoint.sh
 
 USER ${USERNAME}
