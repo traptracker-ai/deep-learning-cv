@@ -52,12 +52,11 @@ deep-learning-cv/
 │   ├── app.py
 │   ├── labs.py                # Lab catalogue (edit to add labs)
 │   └── templates/index.html
-├── labs/                      # Lab notebooks (bind-mounted: your edits persist)
-│   └── lab01_perceptron_mlp/
-│       ├── lab01.ipynb
-│       ├── assets/            # diagrams
-│       └── data/              # local datasets
-└── shared/                    # shared utility modules across labs
+└── labs/                      # Lab notebooks (bind-mounted: your edits persist)
+    └── lab01_perceptron_mlp/
+        ├── lab01.ipynb
+        ├── assets/            # diagrams
+        └── data/              # local datasets
 ```
 
 The `labs/` folder is bind-mounted, which means **your edits to notebooks persist on your host machine** even after the container stops. You can also version-control your work with git directly from outside the container.
