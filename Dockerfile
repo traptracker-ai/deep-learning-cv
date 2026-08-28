@@ -5,7 +5,7 @@
 #
 # Build:   docker compose build
 # Run:     docker compose up
-# Open:    http://localhost:8000   (launcher)
+# Open:    http://localhost:7144   (launcher)
 #          http://localhost:8888   (JupyterLab, if you want to bypass the launcher)
 #
 # ------------------------------------------------------------
@@ -155,8 +155,8 @@ RUN chmod +x /workspace/docker-entrypoint.sh
 USER ${USERNAME}
 
 # Default ports
-#   8000 — launcher (Flask)
+#   7144 — launcher (Flask)
 #   8888 — JupyterLab
-EXPOSE 8000 8888
+EXPOSE 7144 8888
 
 ENTRYPOINT ["/workspace/docker-entrypoint.sh"]

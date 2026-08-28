@@ -2,7 +2,7 @@
 # ============================================================
 # Container entrypoint
 # Starts JupyterLab in the background and the launcher in the foreground.
-# The launcher is the single entry point students hit at http://localhost:8000.
+# The launcher is the single entry point students hit at http://localhost:7144.
 # ============================================================
 set -euo pipefail
 
@@ -23,7 +23,7 @@ fi
 echo "================================================================"
 echo " Deep Learning — module container"
 echo "================================================================"
-echo " Launcher:   http://localhost:8000"
+echo " Launcher:   http://localhost:7144"
 echo " JupyterLab: http://localhost:8888  (token: ${JUPYTER_TOKEN})"
 echo "================================================================"
 
@@ -47,4 +47,4 @@ sleep 2
 # --- Start the launcher in the foreground ---
 # JUPYTER_TOKEN is read by the launcher so it can generate working notebook URLs.
 export JUPYTER_TOKEN
-exec python -m flask --app launcher/app.py run --host=0.0.0.0 --port=8000
+exec python -m flask --app launcher/app.py run --host=0.0.0.0 --port=7144

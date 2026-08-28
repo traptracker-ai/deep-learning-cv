@@ -22,12 +22,12 @@ When you see lines like:
 
 ```
 deep-learning-cv  | * Running on all addresses (0.0.0.0)
-deep-learning-cv  | * Running on http://127.0.0.1:8000
+deep-learning-cv  | * Running on http://127.0.0.1:7144
 ```
 
 open your browser to:
 
-> **http://localhost:8000**
+> **http://localhost:7144**
 
 That's the lab launcher. Click any lab to open it in JupyterLab.
 
@@ -88,7 +88,7 @@ The launcher is the recommended entry point, but if you want to skip it and go s
 ## Troubleshooting
 
 **"port is already allocated"**
-Another container or program is using 8000 or 8888. Stop it, or edit the `ports` section of `docker-compose.yml` to map to different host ports (e.g. `"9000:8000"`).
+Another container or program is using 7144 or 8888. Stop it, or edit the `ports` section of `docker-compose.yml` to map to different host ports (e.g. `"9000:7144"`).
 
 **"docker: command not found"**
 Docker Desktop isn't installed or isn't running. Start Docker Desktop from the Start menu.

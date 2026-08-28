@@ -5,7 +5,7 @@
 #
 #     docker compose up --build
 #
-# Then open http://localhost:8000 in your browser.
+# Then open http://localhost:7144 in your browser.
 #
 # ============================================================
 # GPU support
@@ -35,7 +35,7 @@ services:
     image: deep-learning-cv:latest
     container_name: deep-learning-cv
     ports:
-      - "8000:8000"   # launcher
+      - "7144:7144"   # launcher
       - "8888:8888"   # JupyterLab (direct access if needed)
     volumes:
       # Bind-mount the labs folder so student edits persist on the host.

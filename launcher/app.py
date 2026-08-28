@@ -208,4 +208,4 @@ def annotator_save_annotations(image_name):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=False)
+    app.run(host="0.0.0.0", port=7144, debug=False)
