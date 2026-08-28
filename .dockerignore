@@ -6,6 +6,11 @@
 # Local dev-tool config — not part of the course image
 .claude
 
+# Instructor-only material — must never ship in the student image, which is
+# browsable at /workspace in JupyterLab. Both are untracked in git.
+coursework
+slides
+
 # Python
 __pycache__
 *.pyc
