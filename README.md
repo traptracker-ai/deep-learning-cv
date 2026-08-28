@@ -81,14 +81,14 @@ The `labs/` folder is bind-mounted, which means **your edits to notebooks persis
 
 The launcher is the recommended entry point, but if you want to skip it and go straight to JupyterLab:
 
-> **http://localhost:8888/lab?token=deep-learning-cv**
+> **http://localhost:7154/lab?token=deep-learning-cv**
 
 ---
 
 ## Troubleshooting
 
 **"port is already allocated"**
-Another container or program is using 7144 or 8888. Stop it, or edit the `ports` section of `docker-compose.yml` to map to different host ports (e.g. `"9000:7144"`).
+Another container or program is using 7144 or 7154. Stop it, or edit the `ports` section of `docker-compose.yml` to map to different host ports (e.g. `"9000:7144"`).
 
 **"docker: command not found"**
 Docker Desktop isn't installed or isn't running. Start Docker Desktop from the Start menu.

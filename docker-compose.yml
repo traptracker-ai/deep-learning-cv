@@ -36,7 +36,7 @@ services:
     container_name: deep-learning-cv
     ports:
       - "7144:7144"   # launcher
-      - "8888:8888"   # JupyterLab (direct access if needed)
+      - "7154:7154"   # JupyterLab (direct access if needed)
     volumes:
       # Bind-mount the labs folder so student edits persist on the host.
       # On Windows this works out of the box with Docker Desktop + WSL2.

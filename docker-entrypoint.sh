@@ -24,14 +24,14 @@ echo "================================================================"
 echo " Deep Learning — module container"
 echo "================================================================"
 echo " Launcher:   http://localhost:7144"
-echo " JupyterLab: http://localhost:8888  (token: ${JUPYTER_TOKEN})"
+echo " JupyterLab: http://localhost:7154  (token: ${JUPYTER_TOKEN})"
 echo "================================================================"
 
 # --- Start JupyterLab in the background ---
 cd /workspace
 jupyter lab \
     --ip=0.0.0.0 \
-    --port=8888 \
+    --port=7154 \
     --no-browser \
     --ServerApp.token="${JUPYTER_TOKEN}" \
     --ServerApp.password='' \
