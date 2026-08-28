@@ -131,6 +131,7 @@
       border-right: 1px solid var(--rule);
       overflow-y: auto;
       padding: 12px;
+      position: relative;   /* offsetParent for the virtualized thumbnail rows */
     }
 
     .pane-heading {
@@ -583,6 +584,7 @@
   const zoomResetBtn = document.getElementById("zoom-reset-btn");
   const zoomLevelEl = document.getElementById("zoom-level");
   const nextUnlabelledBtn = document.getElementById("next-unlabelled-btn");
+  const imagesPane = document.querySelector(".images-pane");
 
   // ===================================================================
   // Helpers
@@ -739,16 +741,41 @@
     });
   }
 
+  // The thumbnail list is virtualized: `thumbsList` is a full-height spacer,
+  // but only the ~20 rows near the viewport are ever in the DOM. This keeps
+  // the annotator responsive at tens of thousands of images, where building
+  // — and, on every autosave, rebuilding — one row per image would freeze the
+  // page for seconds. Called on load, on scroll, on resize, and after a save.
+  const ROW_H = 58;          // fixed row height; must match the inline style below
+  const THUMB_OVERSCAN = 8;  // rows rendered beyond the viewport on each side
+
   function renderThumbnails() {
+    thumbsList.style.position = "relative";
+    thumbsList.style.height = (state.images.length * ROW_H) + "px";
+
+    const paneH = imagesPane.clientHeight || 0;
+    const scrollTop = Math.max(0, imagesPane.scrollTop - thumbsList.offsetTop);
+    let start = Math.floor(scrollTop / ROW_H) - THUMB_OVERSCAN;
+    let end = Math.ceil((scrollTop + paneH) / ROW_H) + THUMB_OVERSCAN;
+    start = Math.max(0, start);
+    end = Math.min(state.images.length, end);
+
     thumbsList.innerHTML = "";
-    state.images.forEach(img => {
+    for (let i = start; i < end; i++) {
+      const img = state.images[i];
       const div = document.createElement("div");
       div.className = "thumb" + (img.name === state.currentImage ? " active" : "");
+      div.style.position = "absolute";
+      div.style.top = (i * ROW_H) + "px";
+      div.style.left = "0";
+      div.style.right = "0";
+      div.style.height = ROW_H + "px";
+      div.style.marginBottom = "0";
       const status = img.n_boxes > 0
         ? `<span class="thumb-status has-boxes">${img.n_boxes} box${img.n_boxes === 1 ? "" : "es"}</span>`
         : `<span class="thumb-status">unlabelled</span>`;
       div.innerHTML = `
-        <img src="/annotator/api/image/${encodeURIComponent(img.name)}" alt="" loading="lazy" />
+        <img src="/annotator/api/image/${encodeURIComponent(img.name)}" alt="" loading="lazy" decoding="async" />
         <div class="thumb-meta">
           <span class="thumb-name">${img.name}</span>
           ${status}
@@ -756,8 +783,26 @@
       `;
       div.addEventListener("click", () => loadImage(img.name));
       thumbsList.appendChild(div);
-    });
+    }
   }
+
+  function scrollThumbIntoView(idx) {
+    const rowTop = thumbsList.offsetTop + idx * ROW_H;
+    const rowBottom = rowTop + ROW_H;
+    const viewTop = imagesPane.scrollTop;
+    const viewBottom = viewTop + imagesPane.clientHeight;
+    if (rowTop < viewTop) {
+      imagesPane.scrollTop = rowTop;
+    } else if (rowBottom > viewBottom) {
+      imagesPane.scrollTop = rowBottom - imagesPane.clientHeight;
+    }
+  }
+
+  // Re-render the visible window on scroll. renderThumbnails() only ever
+  // builds ~30 rows, so calling it directly per scroll event (already
+  // frame-throttled by the browser) is cheaper and more reliable than
+  // bouncing through requestAnimationFrame.
+  imagesPane.addEventListener("scroll", renderThumbnails, { passive: true });
 
   function updateProgress() {
     const done = state.images.filter(i => i.n_boxes > 0).length;
@@ -791,6 +836,8 @@
       renderSelectedInfo();
     };
     state.img.src = `/annotator/api/image/${encodeURIComponent(name)}`;
+    const idx = state.images.findIndex(i => i.name === name);
+    if (idx >= 0) scrollThumbIntoView(idx);
     renderThumbnails();
   }
 
@@ -1319,6 +1366,7 @@
       sizeCanvas();
       draw();
     }
+    renderThumbnails();
   });
 
   // Go.

@@ -96,6 +96,44 @@ def load_annotations(image_name: str) -> list[dict]:
     return boxes
 
 
+# Per-image box counts for `/annotator/api/state`, built to stay fast at tens
+# of thousands of images. Two things make it cheap:
+#   1. ONE directory scan of labels/ (os.scandir), not a stat() per image —
+#      30k individual stat calls over a Docker bind mount is seconds of wall
+#      time; one scandir is milliseconds.
+#   2. An in-process cache keyed on (mtime_ns, size), so a warm process only
+#      re-reads and re-parses the handful of label files that actually
+#      changed since the last page load. Files that are absent or empty never
+#      get opened at all.
+_box_count_cache: dict[str, tuple[int, int, int]] = {}
+
+
+def _scan_label_stats() -> dict[str, os.stat_result]:
+    """One pass over labels/: {stem: stat_result} for every .txt file."""
+    out: dict[str, os.stat_result] = {}
+    try:
+        with os.scandir(ANNOTATOR_LABELS_DIR) as it:
+            for entry in it:
+                if entry.name.endswith(".txt") and entry.is_file():
+                    out[entry.name[:-4]] = entry.stat()
+    except FileNotFoundError:
+        pass
+    return out
+
+
+def _count_from_stat(stem: str, st: os.stat_result | None) -> int:
+    """YOLO row count for one label file, given its already-scanned stat. Cached."""
+    if st is None or st.st_size == 0:
+        return 0
+    cached = _box_count_cache.get(stem)
+    if cached is not None and cached[0] == st.st_mtime_ns and cached[1] == st.st_size:
+        return cached[2]
+    fp = ANNOTATOR_LABELS_DIR / f"{stem}.txt"
+    n = sum(1 for ln in fp.read_text().splitlines() if len(ln.split()) == 5)
+    _box_count_cache[stem] = (st.st_mtime_ns, st.st_size, n)
+    return n
+
+
 def save_annotations(image_name: str, boxes: list[dict]) -> None:
     """Write annotations in YOLO format. One row per box."""
     ANNOTATOR_LABELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -154,10 +192,11 @@ def annotator():
 def annotator_state():
     """Return the list of images, their annotation counts, and the class list."""
     images = list_images()
+    stats = _scan_label_stats()
     info = []
     for name in images:
-        ann = load_annotations(name)
-        info.append({"name": name, "n_boxes": len(ann)})
+        stem = name.rsplit(".", 1)[0]
+        info.append({"name": name, "n_boxes": _count_from_stat(stem, stats.get(stem))})
     return jsonify({
         "classes": load_classes(),
         "images": info,
