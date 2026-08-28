@@ -32,7 +32,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: traptracker-ai/deep-learning-cv:latest
+    image: tokaloshi/deep-learning-cv:latest
     container_name: deep-learning-cv
     ports:
       - "7144:7144"   # launcher

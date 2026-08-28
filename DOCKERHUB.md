@@ -19,7 +19,7 @@ docker run -d \
   -e JUPYTER_TOKEN=deep-learning-cv \
   --gpus all \
   --shm-size=2gb \
-  traptracker-ai/deep-learning-cv:latest
+  tokaloshi/deep-learning-cv:latest
 ```
 
 Then open **http://localhost:7144** — that's the lab launcher.
@@ -33,7 +33,7 @@ Then open **http://localhost:7144** — that's the lab launcher.
 ```yaml
 services:
   module:
-    image: traptracker-ai/deep-learning-cv:latest
+    image: tokaloshi/deep-learning-cv:latest
     container_name: deep-learning-cv
     ports:
       - "7144:7144"
